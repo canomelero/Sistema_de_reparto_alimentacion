@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Trabajadores</title>
+</head>
+<body>
+    <h1>Gestión de Trabajadores</h1>
+    
+    <!-- Formulario para dar de alta un trabajador -->
+    <section>
+        <h2>Dar de Alta un Trabajador</h2>
+        <form method="POST" action="/trabajadores/alta">
+            <label>Correo Electrónico:</label>
+            <input type="email" name="correo" required><br>
+            <label>Nombre:</label>
+            <input type="text" name="nombre" required><br>
+            <label>Dirección:</label>
+            <input type="text" name="direccion" required><br>
+            <label>Teléfono:</label>
+            <input type="text" name="telefono" required><br>
+            <button type="submit">Dar de Alta</button>
+        </form>
+    </section>
+
+    <!-- Formulario para dar de baja un trabajador -->
+    <section>
+        <h2>Dar de Baja un Trabajador</h2>
+        <form method="POST" action="/trabajadores/baja">
+            <label>Correo Electrónico:</label>
+            <input type="email" name="correo" required><br>
+            <button type="submit">Dar de Baja</button>
+        </form>
+    </section>
+
+    <!-- Formulario para modificar datos de un trabajador -->
+    <section>
+        <h2>Modificar Trabajador</h2>
+        <form method="POST" action="/trabajadores/modificar">
+            <label>Correo Electrónico:</label>
+            <input type="email" name="correo" required><br>
+            <label>Nuevo Nombre:</label>
+            <input type="text" name="nombre" required><br>
+            <label>Nueva Dirección:</label>
+            <input type="text" name="direccion" required><br>
+            <label>Nuevo Teléfono:</label>
+            <input type="text" name="telefono" required><br>
+            <button type="submit">Modificar</button>
+        </form>
+    </section>
+
+    <!-- Sección para listar trabajadores -->
+    <section>
+        <h2>Lista de Trabajadores</h2>
+        <form method="GET" action="/trabajadores/listar">
+            <button type="submit">Listar Trabajadores</button>
+        </form>
+        <div>
+            {% if trabajadores %}
+                <ul>
+                    {% for trabajador in trabajadores %}
+                        <li>{{ trabajador[1] }} ({{ trabajador[0] }}) - {{ trabajador[2] }}, Tel: {{ trabajador[3] }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Formulario para consultar contrato/informe -->
+    <section>
+        <h2>Consultar Contrato/Informe</h2>
+        <form method="POST" action="/trabajadores/consultar">
+            <label>Correo Electrónico:</label>
+            <input type="email" name="correo" required><br>
+            <button type="submit">Consultar</button>
+        </form>
+        <div>
+            {% if informe %}
+                <p><strong>Horas Trabajadas:</strong> {{ informe[1] }}</p>
+                <p><strong>Número de Pedidos:</strong> {{ informe[2] }}</p>
+                <p><strong>Salario:</strong> {{ informe[3] }}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <p><a href="/">Volver al Inicio</a></p>
+</body>
+</html>
