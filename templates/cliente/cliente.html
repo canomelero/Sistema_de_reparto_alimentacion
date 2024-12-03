@@ -60,7 +60,59 @@
   </header>
 
   <main>
-    <h1>Clientes</h1>
+    <div class="container mt-5 pt-5">
+      <div class="card shadow">
+        <div class="card-body">
+          <form action="" method="POST">
+            <div class="row mb-3">
+              <div class="col">
+                <label>Nombre completo</label>
+                <input type="text" class="form-control mb-3" name="nombre-cliente">
+              </div>
+
+              <div class="col">
+                <label>Email</label>
+                <input type="text" class="form-control mb-3" name="email">
+              </div>
+
+              <div class="col">
+                <label>Dirección</label>
+                <input type="text" class="form-control mb-3" name="direccion">
+              </div>
+
+              <div class="col">
+                <label>Teléfono</label>
+                <input type="text" class="form-control mb-3" name="telefono">
+              </div>
+
+              <div class="col">
+                <button class="btn btn-primary mb-3 mt-4" type="submit">Guardar</button>
+              </div>
+            </div>
+          </form>
+
+          <table class="table table-bordered">
+            <thread>
+                <th scope="col">Id</th>
+                <th scope="col">Nombre cliente</th>
+                <th scope="col">Email</th>
+                <th scope="col">Dirección</th>
+                <th scope="col">Teléfono</th>
+                <th scope="col">Acciones</th>
+            </thread>
+        </table>
+
+        <tbody>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tbody>
+        </div>
+      </div>
+    </div>
   </main>
 
 </body>
