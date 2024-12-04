@@ -1,5 +1,6 @@
 # Driver para PostgreSQL
 import psycopg2 as pg
+import psycopg2.extras as extras
 
 # Variable de contexto global que está diseñada para almacenar datos 
 # específicos de la solicitud activa
@@ -7,6 +8,7 @@ from flask import g
 
 from flask import current_app
 import click
+import os
 
 
 # ---------------------------- Funciones --------------------------------------------------
@@ -24,15 +26,29 @@ def get_db():
     if 'db' not in g:
         g.db = pg.connect(
             # Datos para la conexión a la db
-            dbname = 'python_db',
-            user = 'usuario',
-            password = 'usuario',
+            dbname = 'reparto_db',
+            user = 'ddsiuser',
+            password = '',
             host = 'localhost'
         )
 
         g.db.autocommit = False
 
     return g.db
+
+
+def get_db_cursor():
+    """
+    Creación de cursor a partir de una conexión a la base de datos
+
+    Parámetros:
+        None
+    
+    Return:
+        Objeto de tipo cursor
+    """
+    conexion = get_db()
+    return conexion.cursor(cursor_factory = extras.RealDictCursor)
 
 
 def init_db():
@@ -48,8 +64,10 @@ def init_db():
     conexion = get_db()
     cursor = conexion.cursor()
 
-    with current_app.open_resource("./schemas/cliente.sql") as file:
-        cursor.execute(file.read().decode('utf8'))
+    path = os.getcwd() + "/sql/schemas/cliente.sql"
+
+    with open(path, "r") as file:
+        cursor.execute(file.read())
         cursor.execute('COMMIT;')
 
 

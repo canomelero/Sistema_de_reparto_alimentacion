@@ -63,26 +63,27 @@
     <div class="container mt-5 pt-5">
       <div class="card shadow">
         <div class="card-body">
-          <form action="" method="POST">
+          <!-- action indica la ruta hacia la que serán dirigidos los datos -->
+          <form action="/registro" method="POST">
             <div class="row mb-3">
               <div class="col">
                 <label>Nombre completo</label>
-                <input type="text" class="form-control mb-3" name="nombre-cliente">
+                <input type="text" class="form-control mb-3" name="nombre-cliente" required>
               </div>
 
               <div class="col">
                 <label>Email</label>
-                <input type="text" class="form-control mb-3" name="email">
+                <input type="text" class="form-control mb-3" name="email" required>
               </div>
 
               <div class="col">
                 <label>Dirección</label>
-                <input type="text" class="form-control mb-3" name="direccion">
+                <input type="text" class="form-control mb-3" name="direccion" required>
               </div>
 
               <div class="col">
                 <label>Teléfono</label>
-                <input type="text" class="form-control mb-3" name="telefono">
+                <input type="text" class="form-control mb-3" name="telefono" required>
               </div>
 
               <div class="col">
@@ -93,23 +94,29 @@
 
           <table class="table table-bordered">
             <thread>
-                <th scope="col">Id</th>
-                <th scope="col">Nombre cliente</th>
-                <th scope="col">Email</th>
-                <th scope="col">Dirección</th>
-                <th scope="col">Teléfono</th>
-                <th scope="col">Acciones</th>
+              <th scope="col">Id</th>
+              <th scope="col">Nombre cliente</th>
+              <th scope="col">Email</th>
+              <th scope="col">Dirección</th>
+              <th scope="col">Teléfono</th>
+              <th scope="col">Editar</th>
+              <th scope="col">Eliminar</th>
             </thread>
-        </table>
-
-        <tbody>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tbody>
+          
+            <tbody>
+              {% for cliente in clientes %}
+                <tr>
+                  <td>{{ cliente.id }}</td>
+                  <td>{{ cliente.nombre }}</td>
+                  <td>{{ cliente.email }}</td>
+                  <td>{{ cliente.direccion }}</td>
+                  <td>{{ cliente.telefono }}</td>
+                  <td><button class="btn btn-primary btn-sm" id="">Editar</button></td>
+                  <td><a href="#" class="btn btn-danger btn-sm">Eliminar</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
