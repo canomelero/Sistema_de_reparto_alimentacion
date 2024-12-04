@@ -111,7 +111,7 @@
                   <td>{{ cliente.direccion }}</td>
                   <td>{{ cliente.telefono }}</td>
                   <td>
-                    <button class="btn btn-primary btn-sm" id="">Editar</button>
+                    <button class="btn btn-primary btn-sm" id="btn-edit{{cliente.id}}">Editar</button>
                     <a href="{{ url_for('cliente.borrar', id = cliente.id) }}" class="btn btn-danger btn-sm">Eliminar</a>
                   </td>
                 </tr>

@@ -66,7 +66,7 @@ def registro():
 
 
 # Ruta para eliminar un cliente de la base de datos
-@bp.route("/<int:id>/borrar", methods = ["POST"])
+@bp.route("/borrar/<int:id>")
 def borrar(id):
     """Borrar un cliente de la base de datos
 
@@ -80,7 +80,36 @@ def borrar(id):
 
     cursor.execute(
         "DELETE FROM cliente WHERE id = %s",
-        (id)
+        (id,)
+    )
+
+    conexion.commit()
+    cursor.close()
+
+    return redirect(url_for("cliente.listar"))
+
+
+# Ruta para eliminar un cliente de la base de datos
+@bp.route("/actualizar/<int:id>", methods = ["POST"])
+def actualizar(id):
+    """Actualiza los datos de un cliente de la base de datos
+
+    Parameters
+    ----------
+    id : int
+        Identificador del cliente que se va a eliminar
+    """
+    nombre = request.form["nombre-cliente"]
+    email = request.form["email"]
+    direccion = request.form["direccion"]
+    telf = request.form["telefono"]
+
+    conexion = db.get_db()
+    cursor = db.get_db_cursor()
+
+    cursor.execute(
+        "UPDATE cliente SET nombre = %s, email = %s, direccion = %s, telefono = %s WHERE id = %s",
+        (nombre, email, direccion, telf, id)
     )
 
     conexion.commit()

@@ -15,6 +15,9 @@ from . import cliente
 # app = Flask(__name__, template_folder = template_dir)
 app = Flask(__name__)
 
+#Inicializar base de datos
+db.init_app(app)
+
 # Registro de los blueprint
 app.register_blueprint(cliente.bp, url_prefix="/cliente")
 
@@ -22,6 +25,8 @@ app.register_blueprint(cliente.bp, url_prefix="/cliente")
 @app.route('/')
 def home():
     return render_template('./index.html')
+
+
 
 # def create_app():
 #     """Función de fábrica para crear y configurar la aplicación
