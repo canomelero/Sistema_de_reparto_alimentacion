@@ -61,14 +61,18 @@ def init_db():
     Return:
         None
     """
-    conexion = get_db()
-    cursor = conexion.cursor()
+    cursor = get_db_cursor()
 
-    path = os.getcwd() + "/sql/schemas/cliente.sql"
+    # path = os.getcwd() + "/sql/schemas/cliente.sql"
 
-    with open(path, "r") as file:
-        cursor.execute(file.read())
-        cursor.execute('COMMIT;')
+    # with open(path, "r") as file:
+    #     cursor.execute(file.read())
+    #     cursor.execute('COMMIT;')
+
+    with current_app.open_resource("sql/schemas/cliente.sql") as f:
+        # db.executescript(f.read().decode("utf8"))
+        cursor.execute(f.read().decode("utf8"))
+        cursor.execute("COMMIT;")
 
 
 @click.command('init-db')
@@ -100,7 +104,7 @@ def close_db(exc = None):
     db = g.pop('db', None)
 
     if db is not None:
-        g.db.close()
+        db.close()
 
 
 def init_app(app):
