@@ -6,6 +6,10 @@ from .. import db
 bp = Blueprint("cliente", __name__)
 
 
+# @bp.route("/")
+# def index():
+#     return render_template("./base.html")
+
 # Ruta para listar los clientes de la base de datos
 @bp.route('/clientes', methods = ["GET"])
 def listar():

@@ -30,7 +30,7 @@ app.register_blueprint(trabajador.bp, url_prefix = "/trabajador")
 # Rutas de la app
 @app.route('/')
 def home():
-    return render_template('base.html')
+    return render_template('./base.html')
 
 
 
