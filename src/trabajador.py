@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import psycopg2
-from . import db
+from .. import db
 
 # Creación de blueprint para que todas las rutas de /cliente estén agrupadas
 bp = Blueprint("trabajador", __name__)

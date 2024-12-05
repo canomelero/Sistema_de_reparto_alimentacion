@@ -1,20 +1,23 @@
 from flask import Flask, render_template
 import os   # Para poder manipular rutas de directorios y archivos
 from . import db  
-from . import cliente 
-from . import trabajador
+from .src import cliente 
+from .src import trabajador
 
 
 # # Indicación del directorio donde se encuentra el proyecto (...CRUD-Pyton-Flask/src)
-# template_dir = os.path.abspath(os.path.dirname(__file__))
+template_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 # # Unión de src y templates al directorio del proyecto CRUD-Python-Flask
-# template_dir = os.path.join(template_dir, 'templates')
+template_dir = os.path.join(os.getcwd(), 'Sistema_de_reparto_alimentacion','templates')
+print(template_dir)
+
 
 # Inicialización de Flask indicando donde se ubican los archivos
 # de plantilla (.html) para que se puedan renderizar
-# app = Flask(__name__, template_folder = template_dir)
-app = Flask(__name__)
+app = Flask(__name__, template_folder = template_dir)
+#app = Flask(__name__)
+
 
 #Inicializar base de datos
 db.init_app(app)
@@ -27,7 +30,7 @@ app.register_blueprint(trabajador.bp, url_prefix = "/trabajador")
 # Rutas de la app
 @app.route('/')
 def home():
-    return render_template('./index.html')
+    return render_template('base.html')
 
 
 
