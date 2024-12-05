@@ -1,11 +1,4 @@
 CREATE TABLE restaurante (
-<<<<<<< HEAD
-    id int PRIMARY KEY AUTOINCREMENT,
-    nombre_restaurante VARCHAR2(30),
-    nombre_dueño VARCHAR(30),
-    especialidad
-)
-=======
     id SERIAL PRIMARY KEY,
     nombre_restaurante VARCHAR(30),
     nombre_dueño VARCHAR(30),
@@ -44,4 +37,3 @@ CREATE TABLE informe_restaurante (
     numero_ventas INTEGER DEFAULT 0,
     total_ingresado FLOAT DEFAULT 0.0
 );
->>>>>>> 2851749a50fab8bd3d70003e9e713bf46078402e
