@@ -1,40 +1,47 @@
--- Tabla: Restaurante
-CREATE TABLE Restaurante (
-    ID_restaurante INT PRIMARY KEY,
-    Nombre_restaurante VARCHAR2(100) NOT NULL,
-    Nombre_dueño VARCHAR2(100),
-    Distancia_reparto DECIMAL(5, 2),
-    Especialidad VARCHAR2(100),
-    Horario VARCHAR2(50)
+CREATE TABLE restaurante (
+<<<<<<< HEAD
+    id int PRIMARY KEY AUTOINCREMENT,
+    nombre_restaurante VARCHAR2(30),
+    nombre_dueño VARCHAR(30),
+    especialidad
+)
+=======
+    id SERIAL PRIMARY KEY,
+    nombre_restaurante VARCHAR(30),
+    nombre_dueño VARCHAR(30),
+    distancia_reparto INTEGER DEFAULT 2,
+    especialidad VARCHAR(30),
+    horario_apertura TIME DEFAULT '9:00',
+    horario_cierre TIME DEFAULT '21:00'
 );
 
--- Tabla: Plato-Oferta
-CREATE TABLE Plato_Oferta (
-    ID_plato INT PRIMARY KEY,
-    ID_restaurante INT NOT NULL,
-    Nombre VARCHAR2(100) NOT NULL,
-    Ingredientes TEXT,
-    Descripcion TEXT,
-    Tiempo_preparacion INT,
-    Precio DECIMAL(10, 2),
-    Disponibilidad BOOLEAN,
-    FOREIGN KEY (ID_restaurante) REFERENCES Restaurante(ID_restaurante)
+
+CREATE TABLE plato_oferta (
+    id_plato SERIAL PRIMARY KEY,
+    id_restaurante INTEGER NOT NULL,
+    nombre VARCHAR(30) NOT NULL,
+    ingredientes VARCHAR(60),
+    tiempo_preparacion INTEGER DEFAULT 10,
+    precio FLOAT NOT NULL,
+    disponibilidad BOOLEAN DEFAULT true,
+    FOREIGN KEY (id_restaurante) REFERENCES restaurante(id_restaurante)
 );
 
--- Tabla: Factura
-CREATE TABLE Factura (
-    Fecha DATE NOT NULL,
-    Numero_pedido INT NOT NULL,
-    Correo_electronico VARCHAR2(100) NOT NULL,
-    PRIMARY KEY (Fecha, Numero_pedido),
-    FOREIGN KEY (Numero_pedido) REFERENCES Pedido_Incluye_Reparte(Numero_pedido),
-    FOREIGN KEY (Correo_electronico) REFERENCES Cliente(Correo_electronico)
-);
+CREATE TABLE realiza (
+    id_informe SERIAL NOT NULL, 
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    id_restaurante NOT NULL,
+    PRIMARY KEY (id_informe, fecha_inicio, fecha_fin),
+    FOREIGN KEY (id_informe) REFERENCES informe_restaurante(id_informe),
+    FOREIGN KEY (id_restaurante) REFERENCES restaurante(id_restaurante)
+)
 
--- Tabla: Informe Restaurante
-CREATE TABLE Informe_Restaurante (
-    ID_informe INT PRIMARY KEY,
-    Tiempo_preparacion_pedidos INT,
-    Numero_ventas INT,
-    Total_ingresado DECIMAL(15, 2)
+
+CREATE TABLE informe_restaurante (
+    id_informe SERIAL PRIMARY KEY,
+    tiempo_preparacion_pedidos INTEGER DEFAULT 0,
+    numero_ventas INTEGER DEFAULT 0,
+    total_ingresado FLOAT DEFAULT 0.0
 );
+>>>>>>> 2851749a50fab8bd3d70003e9e713bf46078402e

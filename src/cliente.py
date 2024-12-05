@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, url_for
-from . import db
+from .. import db
 
 
 # Creación de blueprint para que todas las rutas de /cliente estén agrupadas
@@ -21,7 +21,7 @@ def listar():
 
         clientes = cursor.fetchall()
 
-    return render_template('./cliente/cliente.html', clientes = clientes)
+    return render_template('cliente/cliente.html', clientes = clientes)
 
 
 # Ruta para registrar (guardar) clientes en la base de datos
