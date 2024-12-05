@@ -91,7 +91,6 @@ def actualizar(id):
 
     conexion = db.get_db()
     cursor = db.get_db_cursor()
-
     cursor.execute(
         "UPDATE cliente SET nombre = %s, email = %s, direccion = %s, telefono = %s WHERE id_cliente = %s",
         (nombre, email, direccion, telf, id)
@@ -101,3 +100,24 @@ def actualizar(id):
     cursor.close()
 
     return redirect(url_for("cliente.listar"))
+    
+    # if request.method == "POST":
+    #     nombre = request.form["nombre-cliente"]
+    #     email = request.form["email"]
+    #     direccion = request.form["direccion"]
+    #     telf = request.form["telefono"]
+
+    #     conexion = db.get_db()
+    #     cursor = db.get_db_cursor()
+
+    #     cursor.execute(
+    #         "UPDATE cliente SET nombre = %s, email = %s, direccion = %s, telefono = %s WHERE id_cliente = %s",
+    #         (nombre, email, direccion, telf, id)
+    #     )
+
+    #     conexion.commit()
+    #     cursor.close()
+
+    #     return redirect(url_for("cliente.listar"))
+    
+    # return render_template("./cliente/cliente.html", cliente = cliente)

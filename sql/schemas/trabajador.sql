@@ -11,15 +11,15 @@ CREATE TABLE informe_trabajador (
     id_informe INT PRIMARY KEY,
     horas_trabajadas INT,
     numero_pedidos INT,
-    salario DECIMAL(10, 2)
+    salario FLOAT
 );
 
 CREATE TABLE genera (
     id_informe INT NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
-    correo_electronico VARCHAR2(60) NOT NULL,
-    PRIMARY KEY (ID_informe, Fecha_inicio),
-    FOREIGN KEY (ID_informe) REFERENCES Informe_Trabajador(ID_informe),
-    FOREIGN KEY (Correo_electronico) REFERENCES Trabajador(Correo_electronico)
+    email VARCHAR2(60) NOT NULL,
+    PRIMARY KEY (id_informe, fecha_inicio),
+    FOREIGN KEY (id_informe) REFERENCES informe_trabajador(id_informe),
+    FOREIGN KEY (email) REFERENCES trabajador(email)
 );
