@@ -88,3 +88,6 @@ ENV/
 # Rope project settings
 .ropeproject
 .DS_Store
+# Disable data bases files
+.pgdata/
+logfile

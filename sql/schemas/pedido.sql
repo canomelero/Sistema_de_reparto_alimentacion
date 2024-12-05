@@ -1,14 +1,14 @@
 -- Tabla: Pedido-Incluye-Reparte
-CREATE TABLE Pedido_Incluye_Reparte (
-    Numero_pedido INT PRIMARY KEY,
-    ID_plato INT NOT NULL,
-    Correo_electronico VARCHAR2(100) NOT NULL,
-    Direccion_entrega TEXT,
-    Observaciones TEXT,
-    Precio FLOAT,
-    Estado VARCHAR2(50),
-    Tiempo_preparacion INT,
-    Tiempo_entrega INT,
-    FOREIGN KEY (ID_plato) REFERENCES Plato_Oferta(ID_plato),
-    FOREIGN KEY (Correo_electronico) REFERENCES Cliente(Correo_electronico)
+CREATE TABLE pedido_incluye_reparte (
+    mumero_pedido INT PRIMARY KEY,
+    id_plato INT NOT NULL,
+    email VARCHAR2(30) NOT NULL,
+    direccion_entrega VARCHAR(60),
+    observaciones VARCHAR(60),
+    precio FLOAT,
+    estado VARCHAR2(20),
+    tiempo_preparacion INT DEFAULT 20,
+    tiempo_entrega INT DEFAULT 5,
+    FOREIGN KEY (id_plato) REFERENCES plato_oferta(id_plato),
+    FOREIGN KEY (email) REFERENCES cliente(email)
 );
