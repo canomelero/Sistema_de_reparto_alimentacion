@@ -1,25 +1,24 @@
--- Tabla: Trabajador
-CREATE TABLE Trabajador (
-    Correo_electronico VARCHAR2(60) PRIMARY KEY,
-    Nombre VARCHAR2(60) NOT NULL,
-    Direccion VARCHAR2(60),
-    Numero_telefono VARCHAR2(20)
+-- Clave primaria id_trabajador en vez de email
+CREATE TABLE trabajador (
+    id_trabajador SERIAL PRIMARY KEY,
+    email VARCHAR2(60) NOT NULL,
+    nombre VARCHAR2(60) NOT NULL,
+    direccion VARCHAR2(60) NOT NULL,
+    numero_telefono VARCHAR2(20) NOT NULL
 );
 
--- Tabla: Informe Trabajador
-CREATE TABLE Informe_Trabajador (
-    ID_informe INT PRIMARY KEY,
-    Horas_trabajadas INT,
-    Numero_pedidos INT,
-    Salario DECIMAL(10, 2)
+CREATE TABLE informe_trabajador (
+    id_informe INT PRIMARY KEY,
+    horas_trabajadas INT,
+    numero_pedidos INT,
+    salario DECIMAL(10, 2)
 );
 
--- Tabla: Genera
-CREATE TABLE Genera (
-    ID_informe INT NOT NULL,
-    Fecha_inicio DATE NOT NULL,
-    Fecha_fin DATE NOT NULL,
-    Correo_electronico VARCHAR2(60) NOT NULL,
+CREATE TABLE genera (
+    id_informe INT NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    correo_electronico VARCHAR2(60) NOT NULL,
     PRIMARY KEY (ID_informe, Fecha_inicio),
     FOREIGN KEY (ID_informe) REFERENCES Informe_Trabajador(ID_informe),
     FOREIGN KEY (Correo_electronico) REFERENCES Trabajador(Correo_electronico)

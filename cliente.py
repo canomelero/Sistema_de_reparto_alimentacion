@@ -1,28 +1,13 @@
-import functools
-
-from flask import Blueprint
-from flask import flash
-from flask import g
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import session
-from flask import url_for
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash
-
+from flask import Blueprint, redirect, render_template, request, url_for
 from . import db
-# import Sistema_de_reparto_alimentacion as Sistema_de_reparto_alimentacion
 
-import psycopg2
-import psycopg2.extras as extras
 
 # Creación de blueprint para que todas las rutas de /cliente estén agrupadas
 bp = Blueprint("cliente", __name__)
 
 
 # Ruta para listar los clientes de la base de datos
-@bp.route('/clientes')
+@bp.route('/clientes', methods = ["GET"])
 def listar():
     """
     Listar todos los clientes de la app
@@ -45,7 +30,7 @@ def registro():
     """
     Registro de un nuevo cliente
     """
-    nombre = request.form["nombre-cliente"]
+    nombre = request.form["nombre"]
     email = request.form["email"]
     direccion = request.form["direccion"]
     telf = request.form["telefono"]
@@ -66,8 +51,8 @@ def registro():
 
 
 # Ruta para eliminar un cliente de la base de datos
-@bp.route("/borrar/<int:id>")
-def borrar(id):
+@bp.route("/eliminar/<int:id>", methods = ["GET"])
+def eliminar(id):
     """Borrar un cliente de la base de datos
 
     Parameters
@@ -79,7 +64,7 @@ def borrar(id):
     cursor = db.get_db_cursor()
 
     cursor.execute(
-        "DELETE FROM cliente WHERE id = %s",
+        "DELETE FROM cliente WHERE id_cliente = %s",
         (id,)
     )
 
@@ -108,7 +93,7 @@ def actualizar(id):
     cursor = db.get_db_cursor()
 
     cursor.execute(
-        "UPDATE cliente SET nombre = %s, email = %s, direccion = %s, telefono = %s WHERE id = %s",
+        "UPDATE cliente SET nombre = %s, email = %s, direccion = %s, telefono = %s WHERE id_cliente = %s",
         (nombre, email, direccion, telf, id)
     )
 
