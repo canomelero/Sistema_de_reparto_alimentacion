@@ -104,24 +104,16 @@ def actualizar(id):
     cursor.close()
 
     return redirect(url_for("cliente.listar"))
-    
-    # if request.method == "POST":
-    #     nombre = request.form["nombre-cliente"]
-    #     email = request.form["email"]
-    #     direccion = request.form["direccion"]
-    #     telf = request.form["telefono"]
 
-    #     conexion = db.get_db()
-    #     cursor = db.get_db_cursor()
 
-    #     cursor.execute(
-    #         "UPDATE cliente SET nombre = %s, email = %s, direccion = %s, telefono = %s WHERE id_cliente = %s",
-    #         (nombre, email, direccion, telf, id)
-    #     )
+# Ruta para listar los pedidos de un cliente
+@bp.route("/pedidos/<int:id>", methods = ["GET"])
+def pedidos(id):
+    return render_template("cliente/lista_pedidos.html")
 
-    #     conexion.commit()
-    #     cursor.close()
 
-    #     return redirect(url_for("cliente.listar"))
-    
-    # return render_template("./cliente/cliente.html", cliente = cliente)
+# Ruta para listar las facturas de un cliente
+@bp.route("/facturas/<int:id>", methods = ["GET"])
+def facturas(id):
+    return render_template("cliente/lista_facturas.html")
+

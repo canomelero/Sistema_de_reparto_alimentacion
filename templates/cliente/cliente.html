@@ -54,8 +54,12 @@
             <td>
               <button class="btn btn-primary btn-sm" id="btn-edit{{ cliente.id_cliente }}" data-bs-toggle="modal"
                 data-bs-target="#modal{{ cliente.id_cliente }}">Editar</button>
-              <a href="{{ url_for('cliente.eliminar', id = cliente.id_cliente) }}"
-                class="btn btn-danger btn-sm">Eliminar</a>
+              <a href="{{ url_for('cliente.eliminar', id = cliente.id_cliente) }}" class="btn btn-danger btn-sm"
+                onclick="return confirm('¿Estás seguro?');">Eliminar</a>
+              <a href="{{ url_for('cliente.pedidos', id = cliente.id_cliente) }}"
+                class="btn btn-success btn-sm">Pedidos</a>
+              <a href="{{ url_for('cliente.facturas', id = cliente.id_cliente) }}"
+                class="btn btn-info btn-sm">Facturas</a>
             </td>
           </tr>
 

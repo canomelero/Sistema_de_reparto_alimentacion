@@ -1,0 +1,33 @@
+{% extends 'cliente.html' %}
+
+{% block update %}
+<div class="modal fade" id="modal{{ cliente.id_cliente }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">{{ cliente.nombre }}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/cliente/actualizar/{{ cliente.id_cliente }}" method="POST">
+                    <label>Nombre completo</label>
+                    <input type="text" class="form-control mb-3" name="nombre" value="{{ cliente.nombre }}" required>
+                    <label>Email</label>
+                    <input type="text" class="form-control mb-3" name="email" value="{{ cliente.email }}" required>
+                    <label>Dirección</label>
+                    <input type="text" class="form-control mb-3" name="direccion" value="{{ cliente.direccion }}"
+                        required>
+                    <label>Teléfono</label>
+                    <input type="text" class="form-control mb-3" name="telefono" value="{{ cliente.telefono }}"
+                        required>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
