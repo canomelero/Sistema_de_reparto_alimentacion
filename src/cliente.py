@@ -88,7 +88,7 @@ def actualizar(id):
     id : int
         Identificador del cliente que se va a eliminar
     """
-    nombre = request.form["nombre-cliente"]
+    nombre = request.form["nombre"]
     email = request.form["email"]
     direccion = request.form["direccion"]
     telf = request.form["telefono"]
