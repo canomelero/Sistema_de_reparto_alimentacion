@@ -76,11 +76,13 @@ def init_db():
     # with open(path, "r") as file:
     #     cursor.execute(file.read())
     #     cursor.execute('COMMIT;')
+    schemas = ["cliente.sql", "restaurante.sql", "trabajador.sql", "pedido.sql"]
 
-    with current_app.open_resource("sql/schemas/cliente.sql") as f:
-        # db.executescript(f.read().decode("utf8"))
-        cursor.execute(f.read().decode("utf8"))
-        cursor.execute("COMMIT;")
+    for schema in schemas:
+        print(f"Archivo: {schema}")
+        with current_app.open_resource(f"sql/schemas/{schema}") as f:
+            cursor.execute(f.read().decode("utf8"))
+            cursor.execute("COMMIT;")
 
 
 @click.command('init-db')

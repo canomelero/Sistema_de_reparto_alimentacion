@@ -1,8 +1,10 @@
 from flask import Flask, render_template
 import os   # Para poder manipular rutas de directorios y archivos
+
 from . import db  
 from .src import cliente 
 from .src import trabajador
+from .src import restaurante
 
 
 # # Indicación del directorio donde se encuentra el proyecto (...CRUD-Pyton-Flask/src)
@@ -25,6 +27,7 @@ db.init_app(app)
 # Registro de los blueprint
 app.register_blueprint(cliente.bp, url_prefix = "/cliente")
 app.register_blueprint(trabajador.bp, url_prefix = "/trabajador")
+app.register_blueprint(restaurante.bp, url_prefix = "/restaurante")
 
 
 # Rutas de la app

@@ -1,10 +1,13 @@
--- Clave primaria id_trabajador en vez de email
+DROP TABLE IF EXISTS trabajador CASCADE;
+DROP TABLE IF EXISTS informe_trabajador CASCADE;
+DROP TABLE IF EXISTS genera CASCADE;
+
 CREATE TABLE trabajador (
     id_trabajador SERIAL PRIMARY KEY,
-    email VARCHAR2(60),
-    nombre VARCHAR2(60),
-    direccion VARCHAR2(60),
-    numero_telefono VARCHAR2(20)
+    email VARCHAR(60),
+    nombre VARCHAR(60),
+    direccion VARCHAR(60),
+    numero_telefono VARCHAR(20)
 );
 
 CREATE TABLE informe_trabajador (
@@ -18,8 +21,8 @@ CREATE TABLE genera (
     id_informe INT NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
-    email VARCHAR2(60) NOT NULL,
+    id_trabajador INT NOT NULL,
     PRIMARY KEY (id_informe, fecha_inicio),
     FOREIGN KEY (id_informe) REFERENCES informe_trabajador(id_informe),
-    FOREIGN KEY (email) REFERENCES trabajador(email)
+    FOREIGN KEY (id_trabajador) REFERENCES trabajador(id_trabajador)
 );

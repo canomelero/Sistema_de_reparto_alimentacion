@@ -1,0 +1,80 @@
+<div class="container mt-4">
+    <!-- Mostrar mensaje de éxito al eliminar un restaurante -->
+    {% if request.args.get('eliminado') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> El restaurante se ha eliminado correctamente.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Dueño</th>
+                <th scope="col">Distancia Reparto</th>
+                <th scope="col">Especialidad</th>
+                <th scope="col">Horario</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for restaurante in restaurantes %}
+            <tr>
+                <td>{{ restaurante.id }}</td>
+                <td>{{ restaurante.nombre }}</td>
+                <td>{{ restaurante.duenio }}</td>
+                <td>{{ restaurante.distancia_reparto }} km</td>
+                <td>{{ restaurante.especialidad }}</td>
+                <td>{{ restaurante.horario_apertura }} - {{ restaurante.horario_cierre }}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" id="btn-edit{{ restaurante.id }}" data-bs-toggle="modal"
+                        data-bs-target="#modal{{ restaurante.id }}">Editar</button>
+                    <a href="{{ url_for('restaurante.eliminar', id=restaurante.id) }}" class="btn btn-danger btn-sm"
+                        onclick="return confirm('¿Estás seguro?');">Eliminar</a>
+                </td>
+            </tr>
+
+            <!-- Modal para editar un restaurante -->
+            <div class="modal fade" id="modal{{ restaurante.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ restaurante.nombre }}</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/restaurante/actualizar/{{ restaurante.id }}" method="POST">
+                                <label>Nombre del Restaurante</label>
+                                <input type="text" class="form-control mb-3" name="restaurante"
+                                    value="{{ restaurante.nombre }}" required>
+                                <label>Nombre del Dueño</label>
+                                <input type="text" class="form-control mb-3" name="duenio"
+                                    value="{{ restaurante.duenio }}" required>
+                                <label>Distancia de Reparto</label>
+                                <input type="number" class="form-control mb-3" name="distancia_reparto"
+                                    value="{{ restaurante.distancia_reparto }}" required>
+                                <label>Especialidad</label>
+                                <input type="text" class="form-control mb-3" name="especialidad"
+                                    value="{{ restaurante.especialidad }}" required>
+                                <label>Horario de Apertura</label>
+                                <input type="time" class="form-control mb-3" name="horario_apertura"
+                                    value="{{ restaurante.horario_apertura }}" required>
+                                <label>Horario de Cierre</label>
+                                <input type="time" class="form-control mb-3" name="horario_cierre"
+                                    value="{{ restaurante.horario_cierre }}" required>
+
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

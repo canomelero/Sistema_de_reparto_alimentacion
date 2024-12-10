@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <!-- Formulario para agregar un nuevo restaurante -->
+            <form action="/restaurante/add" method="POST">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label>Nombre del Restaurante</label>
+                        <input type="text" class="form-control mb-3" name="restaurante" required>
+                    </div>
+                    <div class="col">
+                        <label>Nombre del Dueño</label>
+                        <input type="text" class="form-control mb-3" name="duenio" required>
+                    </div>
+                    <div class="col">
+                        <label>Distancia de Reparto (km)</label>
+                        <input type="number" class="form-control mb-3" name="distancia_reparto" min="0" step="0.1"
+                            required>
+                    </div>
+                    <div class="col">
+                        <label>Especialidad</label>
+                        <input type="text" class="form-control mb-3" name="especialidad" required>
+                    </div>
+                    <div class="col">
+                        <label>Horario de Apertura</label>
+                        <input type="time" class="form-control mb-3" name="horario_apertura" required>
+                    </div>
+                    <div class="col">
+                        <label>Horario de Cierre</label>
+                        <input type="time" class="form-control mb-3" name="horario_cierre" required>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-primary mb-3 mt-4" type="submit">Guardar</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Tabla y modales -->
+            {% include 'restaurante/tablas_restaurantes.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}
