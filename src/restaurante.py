@@ -16,22 +16,26 @@ def add():
     cursor = get_db_cursor()
 
     if request.method == "POST":
-        nombre_restuarante = request.form["restaurante"]
-        nombre_duenio = request.form["duenio"]
-        distancia_reparto = request.form["distancia_reparto"]
-        especialidad = request.form["especialidad"]
-        horario_apertura = request.form["horario_apertura"]
-        horario_cierre = request.form["horario_cierre"]
+        nombre_restuarante = (request.form["restaurante"] if request.form["restaurante"] 
+                              else 'Mesón Paco')
+        nombre_duenio = request.form["duenio"] if request.form["duenio"] else 'Paco'
+        distancia_reparto = (request.form["distancia_reparto"] if request.form["distancia_reparto"] 
+                             else '2')
+        especialidad = (request.form["especialidad"] if request.form["especialidad"] 
+                        else 'Ninguna')
+        horario_apertura = (request.form["horario_apertura"] if request.form["horario_apertura"] 
+                            else '09:00')
+        horario_cierre = (request.form["horario_cierre"] if request.form["horario_cierre"] 
+                          else '21:00')
 
-        
         cursor.execute(
-        """
-        INSERT INTO restaurante (restaurante, duenio, distancia_reparto, especialidad,
-        horario_apertura, horario_cierre)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        """,
-        (nombre_restuarante, nombre_duenio, distancia_reparto, especialidad, 
-         horario_apertura, horario_cierre),
+            """
+            INSERT INTO restaurante (restaurante, duenio, distancia_reparto, especialidad,
+            horario_apertura, horario_cierre)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (nombre_restuarante, nombre_duenio, distancia_reparto, especialidad, 
+            horario_apertura, horario_cierre),
         )
 
         get_db().commit()

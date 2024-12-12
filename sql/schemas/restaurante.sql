@@ -3,14 +3,15 @@ DROP TABLE IF EXISTS plato_oferta CASCADE;
 DROP TABLE IF EXISTS informe_restaurante CASCADE;
 DROP TABLE IF EXISTS realiza;
 
+-- Los valores por defectos están gestionados con el post directamente
 CREATE TABLE restaurante (
     id SERIAL PRIMARY KEY,
-    restaurante VARCHAR(30) DEFAULT 'Sin nombre',
-    duenio VARCHAR(30) DEFAULT 'Bad Gyal',
+    restaurante VARCHAR(30),
+    duenio VARCHAR(30),
     distancia_reparto INTEGER DEFAULT 2,
-    especialidad VARCHAR(30) DEFAULT 'Ninguna',
-    horario_apertura TIME DEFAULT '9:00',
-    horario_cierre TIME DEFAULT '21:00'
+    especialidad VARCHAR(30),
+    horario_apertura TIME,
+    horario_cierre TIME
 );
 
 

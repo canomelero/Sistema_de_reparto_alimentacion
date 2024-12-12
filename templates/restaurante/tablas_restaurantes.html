@@ -49,22 +49,22 @@
                             <form action="/restaurante/actualizar/{{ restaurante.id }}" method="POST">
                                 <label>Nombre del Restaurante</label>
                                 <input type="text" class="form-control mb-3" name="restaurante"
-                                    value="{{ restaurante.nombre }}" required>
+                                    value="{{ restaurante.nombre }}">
                                 <label>Nombre del Dueño</label>
                                 <input type="text" class="form-control mb-3" name="duenio"
-                                    value="{{ restaurante.duenio }}" required>
+                                    value="{{ restaurante.duenio }}">
                                 <label>Distancia de Reparto</label>
                                 <input type="number" class="form-control mb-3" name="distancia_reparto"
-                                    value="{{ restaurante.distancia_reparto }}" required>
+                                    value="{{ restaurante.distancia_reparto }}">
                                 <label>Especialidad</label>
                                 <input type="text" class="form-control mb-3" name="especialidad"
-                                    value="{{ restaurante.especialidad }}" required>
+                                    value="{{ restaurante.especialidad }}">
                                 <label>Horario de Apertura</label>
                                 <input type="time" class="form-control mb-3" name="horario_apertura"
-                                    value="{{ restaurante.horario_apertura }}" required>
+                                    value="{{ restaurante.horario_apertura }}">
                                 <label>Horario de Cierre</label>
                                 <input type="time" class="form-control mb-3" name="horario_cierre"
-                                    value="{{ restaurante.horario_cierre }}" required>
+                                    value="{{ restaurante.horario_cierre }}">
 
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-primary">Guardar</button>

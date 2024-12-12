@@ -7,34 +7,44 @@
             <!-- Formulario para agregar un nuevo restaurante -->
             <form action="/restaurante/add" method="POST">
                 <div class="row mb-3">
-                    <div class="col">
-                        <label>Nombre del Restaurante</label>
-                        <input type="text" class="form-control mb-3" name="restaurante" required>
+                    <div class="col-md-6">
+                        <label for="restaurante" class="form-label">Nombre del Restaurante</label>
+                        <input type="text" class="form-control" id="restaurante" name="restaurante"
+                            placeholder="Mesón Paco">
                     </div>
-                    <div class="col">
-                        <label>Nombre del Dueño</label>
-                        <input type="text" class="form-control mb-3" name="duenio" required>
+                    <div class="col-md-6">
+                        <label for="duenio" class="form-label">Nombre del Dueño</label>
+                        <input type="text" class="form-control" id="duenio" name="duenio" placeholder="Paco">
                     </div>
-                    <div class="col">
-                        <label>Distancia de Reparto (km)</label>
-                        <input type="number" class="form-control mb-3" name="distancia_reparto" min="0" step="0.1"
-                            required>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="distancia_reparto" class="form-label">Distancia de Reparto (km)</label>
+                        <input type="number" class="form-control" id="distancia_reparto" name="distancia_reparto"
+                            min="0" step="0.1" placeholder="2">
                     </div>
-                    <div class="col">
-                        <label>Especialidad</label>
-                        <input type="text" class="form-control mb-3" name="especialidad" required>
+                    <div class="col-md-6">
+                        <label for="especialidad" class="form-label">Especialidad</label>
+                        <input type="text" class="form-control" id="especialidad" name="especialidad"
+                            placeholder="Ninguna">
                     </div>
-                    <div class="col">
-                        <label>Horario de Apertura</label>
-                        <input type="time" class="form-control mb-3" name="horario_apertura" required>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="horario_apertura" class="form-label">Horario de Apertura</label>
+                        <input type="time" class="form-control" id="horario_apertura" name="horario_apertura"
+                            value="09:00">
                     </div>
-                    <div class="col">
-                        <label>Horario de Cierre</label>
-                        <input type="time" class="form-control mb-3" name="horario_cierre" required>
+                    <div class="col-md-6">
+                        <label for="horario_cierre" class="form-label">Horario de Cierre</label>
+                        <input type="time" class="form-control" id="horario_cierre" name="horario_cierre" value="21:00">
                     </div>
-                    <div class="col">
-                        <button class="btn btn-primary mb-3 mt-4" type="submit">Guardar</button>
-                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" type="submit">Guardar</button>
                 </div>
             </form>
 
