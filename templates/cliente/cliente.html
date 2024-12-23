@@ -46,7 +46,11 @@
         <tbody>
           {% for cliente in clientes %}
             <tr>
-              <td>{{ cliente.id_cliente }}</td>
+              <td>
+                <!-- La dirección tiene que ser restaurante.listar o algo así
+                <a href="{{ url_for('cliente.pedidos', id = cliente.id_cliente) }}"></a> -->
+                {{ cliente.id_cliente }}
+              </td>
               <td>{{ cliente.nombre }}</td>
               <td>{{ cliente.email }}</td>
               <td>{{ cliente.direccion }}</td>
