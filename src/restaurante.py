@@ -44,14 +44,52 @@ def add():
     restaurantes = cursor.fetchall()
     return render_template("restaurante/restaurante.html", restaurantes=restaurantes)
 
+
 @bp.route('/eliminar/<int:id>', methods=("POST", "GET"))
 # Id lo obtiene del parámetro ruta int:id
-def eliminar(id):
+def eliminar(id: int):
     cursor = get_db_cursor()
     cursor.execute("DELETE FROM plato_oferta WHERE id_restaurante = %s", (id,))
     cursor.execute("DELETE FROM restaurante WHERE id = %s", (id,))
     get_db().commit()
     return redirect(url_for("restaurante.add", eliminado=True))
+
+
+@bp.route('/editar/<int:id>', methods=("POST", "GET"))
+def editar(id: int):
+    cursor = get_db_cursor()
+
+    # Obtener los valores que había anteriormente en el restaurante
+    cursor.execute("SELECT * FROM restaurante WHERE id = %s", (id,))
+    restaurante = cursor.fetchone()
+
+    if request.method == "POST":
+        # Obtener los nuevos valores del formulario
+        nombre_restaurante = (request.form["restaurante"] if request.form["restaurante"] 
+                              else restaurante['restaurante'])
+        nombre_duenio = (request.form["duenio"] if request.form["duenio"] 
+                         else restaurante['duenio'])
+        distancia_reparto = (request.form["distancia_reparto"] if request.form["distancia_reparto"]
+                            else restaurante['distancia_reparto'])
+        especialidad = (request.form["especialidad"] if request.form["especialidad"] 
+                        else restaurante['especialidad'])
+        horario_apertura = (request.form["horario_apertura"] if request.form["horario_apertura"] 
+                            else restaurante['horario_apertura'])
+        horario_cierre = (request.form["horario_cierre"] if request.form["horario_cierre"] 
+                          else restaurante['horario_cierre'])
+
+        cursor.execute(
+            """
+            UPDATE restaurante
+            SET restaurante = %s, duenio = %s, distancia_reparto = %s, especialidad = %s,
+                horario_apertura = %s, horario_cierre = %s
+            WHERE id = %s
+            """, 
+            (nombre_restaurante, nombre_duenio, distancia_reparto, especialidad, 
+            horario_apertura, horario_cierre, id))
+
+        get_db().commit()
+        return redirect(url_for('restaurante.add'))
 
 
 
@@ -96,3 +134,33 @@ def eliminar_plato(id_plato: int, id_restaurante: int):
     cursor.execute("DELETE FROM plato_oferta WHERE id_plato = %s", (id_plato,))
     get_db().commit()
     return redirect(url_for("restaurante.aniadir_plato", id=id_restaurante, eliminado=True))
+
+
+@bp.route('/platos/editar/<int:id_plato>/id_restaurante=<int:id_restaurante>', methods=("GET", "POST"))
+def editar_plato(id_plato: int, id_restaurante: int):
+    cursor = get_db_cursor()
+
+    cursor.execute("SELECT * FROM plato_oferta WHERE id_plato = %s", (id_plato,))
+    plato = cursor.fetchone()
+
+    if not plato:
+        return redirect(url_for('restaurante.aniadir_plato', id_restaurante=id_restaurante))
+
+    if request.method == "POST":
+        nombre = (request.form["nombre"] if request.form["nombre"] else plato['nombre'])
+        ingredientes = (request.form["ingredientes"] if request.form["ingredientes"] 
+                        else plato['ingredientes'])
+        tiempo_preparacion = (request.form["tiempo_preparacion"] if request.form["tiempo_preparacion"] 
+                              else plato['tiempo_preparacion'])
+        precio = (request.form["precio"] if request.form["precio"] else plato['precio'])
+        disponibilidad = (request.form["disponibilidad"] if request.form["disponibilidad"] 
+                          else plato['disponibilidad'])
+
+        cursor.execute("""
+            UPDATE plato_oferta
+            SET nombre = %s, ingredientes = %s, tiempo_preparacion = %s, precio = %s, 
+            disponibilidad = %s WHERE id_plato = %s
+        """, (nombre, ingredientes, tiempo_preparacion, precio, disponibilidad, id_plato))
+
+        get_db().commit()
+        return redirect(url_for("restaurante.aniadir_plato", id_restaurante=id_restaurante))

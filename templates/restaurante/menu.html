@@ -111,7 +111,8 @@
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="/platos/update/{{ plato.id_plato }}" method="POST">
+                                        <form action="{{ url_for('restaurante.editar_plato', id_plato=plato.id_plato, 
+                                                         id_restaurante=restaurante.id) }}" method="POST">
                                             <label for="nombre">Nombre del Plato</label>
                                             <input type="text" class="form-control mb-3" name="nombre"
                                                 value="{{ plato.nombre }}">

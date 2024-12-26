@@ -48,7 +48,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="/restaurante/actualizar/{{ restaurante.id }}" method="POST">
+                            <form action="{{ url_for('restaurante.editar', id=restaurante.id) }}" method="POST">
                                 <label>Nombre del Restaurante</label>
                                 <input type="text" class="form-control mb-3" name="restaurante"
                                     value="{{ restaurante.nombre }}">
