@@ -91,3 +91,4 @@ ENV/
 # Disable data bases files
 pgdata/
 logfile
+starter.sh

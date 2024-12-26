@@ -20,10 +20,10 @@ CREATE TABLE plato_oferta (
     id_restaurante INTEGER NOT NULL,
     nombre VARCHAR(30) NOT NULL,
     ingredientes VARCHAR(60),
-    tiempo_preparacion INTEGER DEFAULT 10,
-    precio FLOAT NOT NULL,
-    disponibilidad BOOLEAN DEFAULT true,
-    FOREIGN KEY (id_restaurante) REFERENCES restaurante(id)
+    tiempo_preparacion INTEGER DEFAULT,
+    precio NUMERIC(4, 2) NOT NULL,
+    disponibilidad BOOLEAN,
+    FOREIGN KEY (id_restaurante) REFERENCES restaurante(id),
 );
 
 

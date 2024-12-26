@@ -33,6 +33,8 @@
                         data-bs-target="#modal{{ restaurante.id }}">Editar</button>
                     <a href="{{ url_for('restaurante.eliminar', id=restaurante.id) }}" class="btn btn-danger btn-sm"
                         onclick="return confirm('¿Estás seguro?');">Eliminar</a>
+                    <a href="{{ url_for('restaurante.aniadir_plato', id_restaurante=restaurante.id) }}"
+                        class="btn btn-info btn-sm">Menú</a>
                 </td>
             </tr>
 

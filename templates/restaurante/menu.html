@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    {% if request.args.get('eliminado') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> El plato se ha eliminado correctamente.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <div class="card shadow">
+        <div class="card-body">
+            <!-- Formulario para agregar un nuevo plato -->
+            <form action="{{ url_for('restaurante.aniadir_plato', id_restaurante=restaurante.id) }}" method="POST">
+                <h4 class="mb-4">Agregar Nuevo Plato</h4>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label">
+                            Nombre del Plato <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nombre" name="nombre"
+                            placeholder="Hamburguesa Especial" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="precio" class="form-label">
+                            Precio (€) <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="precio" name="precio" min="0" step="0.1"
+                            placeholder="9.99" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="ingredientes" class="form-label">
+                            Ingredientes
+                        </label>
+                        <input type="text" class="form-control" id="ingredientes" name="ingredientes"
+                            placeholder="Carne, queso, cebolla">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="tiempo_preparacion" class="form-label">
+                            Tiempo de Preparación (min)
+                        </label>
+                        <input type="number" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion"
+                            min="1" step="1" placeholder="15">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="disponibilidad" class="form-label">
+                            Disponibilidad
+                        </label>
+                        <select class="form-select" id="disponibilidad" name="disponibilidad">
+                            <option value="true" selected>Disponible</option>
+                            <option value="false">No Disponible</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" type="submit">Guardar</button>
+                </div>
+            </form>
+
+            <div class="mt-5">
+                <h4>Platos del Restaurante</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Ingredientes</th>
+                            <th scope="col">Tiempo de Preparación</th>
+                            <th scope="col">Precio (€)</th>
+                            <th scope="col">Disponibilidad</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plato in platos_restaurante %}
+                        <tr>
+                            <td>{{ plato.id_plato }}</td>
+                            <td>{{ plato.nombre }}</td>
+                            <td>{{ plato.ingredientes }}</td>
+                            <td>{{ plato.tiempo_preparacion }} min</td>
+                            <td>{{ plato.precio }}</td>
+                            <td>{{ "Disponible" if plato.disponibilidad == "true" else "No Disponible" }}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#modal{{ plato.id_plato }}">Editar</button>
+                                <a href="{{ url_for('restaurante.eliminar_plato', id_plato=plato.id_plato,
+                                             id_restaurante=restaurante.id) }}" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('¿Estás seguro?');">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+
+                        <!-- Modal para editar un plato -->
+                        <div class="modal fade" id="modal{{ plato.id_plato }}" tabindex="-1"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Editar {{ plato.nombre }}
+                                        </h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="/platos/update/{{ plato.id_plato }}" method="POST">
+                                            <label for="nombre">Nombre del Plato</label>
+                                            <input type="text" class="form-control mb-3" name="nombre"
+                                                value="{{ plato.nombre }}">
+                                            <label for="ingredientes">Ingredientes</label>
+                                            <input type="text" class="form-control mb-3" name="ingredientes"
+                                                value="{{ plato.ingredientes }}">
+                                            <label for="tiempo_preparacion">Tiempo de Preparación</label>
+                                            <input type="number" class="form-control mb-3" name="tiempo_preparacion"
+                                                value="{{ plato.tiempo_preparacion }}">
+                                            <label for="precio">Precio</label>
+                                            <input type="number" class="form-control mb-3" name="precio"
+                                                value="{{ plato.precio }}" min="0" step="0.01">
+                                            <label for="disponibilidad">Disponibilidad</label>
+                                            <select class="form-select mb-3" name="disponibilidad">
+                                                <option value="true" {{ "selected" if plato.disponibilidad=="true"
+                                                    else "" }}>Disponible</option>
+                                                <option value="false" {{ "selected" if plato.disponibilidad=="false"
+                                                    else "" }}>No Disponible</option>
+                                            </select>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
