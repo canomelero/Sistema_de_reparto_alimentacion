@@ -8,67 +8,18 @@
 
             <table class="table table-bordered">
                 <thread>
-                    <th scope="col">Id</th>
-                    <th scope="col">Nombre cliente</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Dirección</th>
-                    <th scope="col">Teléfono</th>
-                    <th scope="col">Acciones</th>
+                    <th scope="col">Id Cliente</th>
+                    <th scope="col">Número pedido</th>
+                    <th scope="col">Fecha</th>
                 </thread>
 
                 <tbody>
-                    {% for cliente in clientes %}
-                    <tr>
-                        <td>{{ cliente.id_cliente }}</td>
-                        <td>{{ cliente.nombre }}</td>
-                        <td>{{ cliente.email }}</td>
-                        <td>{{ cliente.direccion }}</td>
-                        <td>{{ cliente.telefono }}</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" id="btn-edit{{ cliente.id_cliente }}"
-                                data-bs-toggle="modal" data-bs-target="#modal{{ cliente.id_cliente }}">Editar</button>
-                            <a href="{{ url_for('cliente.eliminar', id = cliente.id_cliente) }}"
-                                class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro?');">Eliminar</a>
-                            <a href="{{ url_for('cliente.pedidos', id = cliente.id_cliente) }}"
-                                class="btn btn-success btn-sm">Pedidos</a>
-                            <a href="{{ url_for('cliente.facturas', id = cliente.id_cliente) }}"
-                                class="btn btn-info btn-sm">Facturas</a>
-                        </td>
-                    </tr>
-
-                    <!-- Ventana modal que se abrirá al acceder a "editar" en cliente -->
-                    <div class="modal fade" id="modal{{ cliente.id_cliente }}" tabindex="-1"
-                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">{{ cliente.nombre }}</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form action="/cliente/actualizar/{{ cliente.id_cliente }}" method="POST">
-                                        <label>Nombre completo</label>
-                                        <input type="text" class="form-control mb-3" name="nombre"
-                                            value="{{ cliente.nombre }}" required>
-                                        <label>Email</label>
-                                        <input type="text" class="form-control mb-3" name="email"
-                                            value="{{ cliente.email }}" required>
-                                        <label>Dirección</label>
-                                        <input type="text" class="form-control mb-3" name="direccion"
-                                            value="{{ cliente.direccion }}" required>
-                                        <label>Teléfono</label>
-                                        <input type="text" class="form-control mb-3" name="telefono"
-                                            value="{{ cliente.telefono }}" required>
-
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn btn-primary">Guardar</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {% for factura in facturas %}
+                        <tr>
+                            <td>{{ factura.id_cliente }}</td>
+                            <td>{{ factura.num_pedido }}</td>
+                            <td>{{ factura.fecha }}</td>                
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

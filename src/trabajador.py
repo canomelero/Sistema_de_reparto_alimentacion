@@ -29,10 +29,10 @@ def listar():
             "SELECT * FROM trabajador"
         )
 
-        trabajadores = cursor.fecthall()
+        trabajadores = cursor.fetchall()
     
-    # He quitado el el envío del informe al html
-    return render_template("trabajador.html", trabajadores = trabajadores)
+    # He quitado el envío del informe al html
+    return render_template("trabajador/trabajador.html", trabajadores = trabajadores)
 
 
 # Ruta para registrar un trabajador en la base de datos

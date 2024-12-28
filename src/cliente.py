@@ -109,11 +109,43 @@ def actualizar(id):
 # Ruta para listar los pedidos de un cliente
 @bp.route("/pedidos/<int:id>", methods = ["GET"])
 def pedidos(id):
-    return render_template("cliente/lista_pedidos.html")
+    cursor = db.get_db_cursor()
+
+    # Hay que filtrar primero por cliente y luego mostrar los pedidos del cliente
+
+    cursor.execute(
+        "SELECT * FROM pedido_incluye_reparte WHERE numero_pedido = %s",
+        (id,)
+    )
+
+    pedidos = cursor.fetchall()
+
+    return render_template("cliente/lista_pedidos.html", pedidos = pedidos)
 
 
 # Ruta para listar las facturas de un cliente
 @bp.route("/facturas/<int:id>", methods = ["GET"])
 def facturas(id):
-    return render_template("cliente/lista_facturas.html")
+    cursor = db.get_db_cursor()
+
+    # Hay que filtrar primero por cliente y luego mostrar los pedidos del cliente
+
+    cursor.execute(
+        "SELECT * FROM factura WHERE numero_pedido = %s",
+        (id,)
+    )
+
+    facturas = cursor.fetchall()
+
+    return render_template("cliente/lista_facturas.html", facturas = facturas)
+
+
+# Ruta para realizar un pedido
+# Se clicka sobre el nombre del cliente
+# Se redirige a un endpoint de resturante.py que liste los restaurantes disponibles
+# Se clicka sobre un restaurante y muestra los platos que oferta ese restaurante
+# Se clicka sobre la opción "pedir" que habrá para cada plato disponible
+# El pedido clickado se guarda en la tabla pedido 
+# El pedido se podrá pagar y una vez pagado se guarda en la tabla factura
+
 

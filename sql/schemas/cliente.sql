@@ -9,12 +9,11 @@ CREATE TABLE cliente (
     telefono VARCHAR(20)
 );
 
--- CREATE TABLE Factura (
---     fecha DATE NOT NULL,
---     numero_pedido INT NOT NULL,
---     email TEXT NOT NULL,
---     PRIMARY KEY (fecha, numero_pedido),
---     FOREIGN KEY (numero_pedido) REFERENCES pedido_incluye_reparte(numero_pedido),
---     FOREIGN KEY (correo_electronico) REFERENCES cliente(correo_electronico)
--- );
+CREATE TABLE factura (
+    numero_pedido INT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    id_cliente INT NOT NULL,   -- PONÍA EMAIL Y LO HE CAMBIADO A ID DEL CLIENTE
+    FOREIGN KEY (numero_pedido) REFERENCES pedido_incluye_reparte(numero_pedido),
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+);
 

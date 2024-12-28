@@ -3,6 +3,6 @@
 cd $(dirname $(find ~ -type d -name "Sistema_de_reparto_alimentacion"))
 condaInit
 conda activate DDSI
-pg_ctl -D ./Sistema_de_reparto_alimentacion/pgdata -l Sistema_de_reparto_alimentacion/logfile start
+pg_ctl -D ~/Escritorio/ddsi/pgdata -l ~/Escritorio/ddsi/logfile start
 flask --app Sistema_de_reparto_alimentacion init-db
 flask --app Sistema_de_reparto_alimentacion run --debug
