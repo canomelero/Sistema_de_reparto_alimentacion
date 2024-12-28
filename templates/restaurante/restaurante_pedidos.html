@@ -44,9 +44,10 @@
                                 </div>
                                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
                                     <span class="badge bg-primary mb-2 d-block d-md-inline">{{ plato.precio }}€</span>
-                                    <form
-                                        action="{{ url_for('restaurante.add_plato_pedido', id_cliente=id_cliente, id_plato=plato.id_plato) }}"
-                                        method="POST" class="d-inline">
+                                    <form action="{{ url_for('restaurante.add_plato_pedido', 
+                                                id_cliente=id_cliente, id_plato=plato.id_plato, 
+                                                id_restaurante=plato.id_restaurante) }}" method="POST"
+                                        class="d-inline">
                                         <button class="btn btn-success btn-sm" type="submit">
                                             <i class="bi bi-plus-circle"></i> Añadir
                                         </button>

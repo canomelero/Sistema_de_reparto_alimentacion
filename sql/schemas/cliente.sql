@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS cliente CASCADE;
+DROP TABLE IF EXISTS factura CASCADE;
 
 -- Clave primaria id_cliente en vez de email
 CREATE TABLE cliente (

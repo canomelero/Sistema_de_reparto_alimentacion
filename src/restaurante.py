@@ -5,6 +5,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask import Response
 from werkzeug.exceptions import abort
 
 from ..db import get_db, get_db_cursor
@@ -192,6 +193,46 @@ def mostrar_rest_plat(id_cliente: int):
         id_cliente=id_cliente
     )
 
-@bp.route('/anidadir_plato_pedido/<int:id_cliente>/<int:id_plato>', methods=("GET", "POST"))
-def add_plato_pedido(id_cliente: int, id_plato: int):
-    print("empty")
+@bp.route("/anidadir_plato_pedido/id_cliente=<int:id_cliente>/id_plato=<int:id_plato>"
+          "/id_restaurante=<int:id_restaurante>", methods=("GET", "POST"))
+def add_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
+    cursor = get_db_cursor()
+
+    if request.method == "POST":
+        cursor.execute("SELECT precio, tiempo_preparacion FROM plato_oferta WHERE id_plato = %s",
+                      (id_plato,))
+        result = cursor.fetchone()
+        print(result, "\n\n\n")
+
+        cursor.execute("SELECT CURRENT_DATE")
+        fecha_actual = cursor.fetchone()
+        print(fecha_actual, "\n\n\n")
+
+        # Añadir trigger aquí para enviar a pedidos y así ahorrar código
+        cursor.execute(
+            """
+            UPDATE ventas_diarias
+            SET tiempo_preparacion = tiempo_preparacion + %s, 
+                total_ingresado = total_ingresado + %s, 
+                platos_vendidos = platos_vendidos + 1
+            WHERE id_restaurante = %s AND fecha = %s
+            """, 
+            (result["tiempo_preparacion"], result["precio"], id_restaurante, 
+             fecha_actual["current_date"])
+        )
+
+        if cursor.rowcount == 0: # Si no se ha hecho el update porque no existe el registro
+            # Añadir trigger aquí para crear el pedido y así evitar código extra
+            cursor.execute(
+                """
+                INSERT INTO ventas_diarias (id_restaurante, fecha, tiempo_preparacion,
+                total_ingresado, platos_vendidos)
+                VALUES (%s, %s, %s, %s, %s)
+                """, 
+                (id_restaurante, fecha_actual["current_date"], result["tiempo_preparacion"],
+                 result["precio"], 1)
+            )
+        
+        get_db().commit()
+        return Response(status=204)
+        

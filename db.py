@@ -76,13 +76,24 @@ def init_db():
     # with open(path, "r") as file:
     #     cursor.execute(file.read())
     #     cursor.execute('COMMIT;')
-    schemas = ["cliente.sql", "restaurante.sql", "trabajador.sql", "pedido.sql"]
+    schemas = ["restaurante.sql", "trabajador.sql", "pedido.sql", "cliente.sql"]
 
     for schema in schemas:
         print(f"Archivo: {schema}")
         with current_app.open_resource(f"sql/schemas/{schema}") as f:
             cursor.execute(f.read().decode("utf8"))
             cursor.execute("COMMIT;")
+
+    # Cargar todos los archivos que son triggers
+    triggers_files = [f for f in os.listdir("sql/triggers")]
+
+    for t_files in triggers_files:
+        print(f"Archivo: {t_files}")
+        with current_app.open_resource(f"sql/triggers/{t_files}") as f:
+            cursor.execute(f.read().decode("utf8"))
+            cursor.execute("COMMIT;")
+
+    
 
 
 @click.command('init-db')

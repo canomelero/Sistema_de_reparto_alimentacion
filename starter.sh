@@ -7,9 +7,7 @@ cd $(dirname $(find ~ -type d -name "Sistema_de_reparto_alimentacion"))
 condaInit
 conda activate DDSI
 # Copiar y pegar y modificar cada uno el suyo de pg_ctl
-pg_ctl -D ~/Desktop/DDSI/Sistema_de_reparto_alimentacion/pgdata \ 
--l ~/Desktop/DDSI/Sistema_de_reparto_alimentacion/logfile start
-
+pg_ctl -D ~/Desktop/DDSI/Sistema_de_reparto_alimentacion/pgdata -l ~/Desktop/DDSI/Sistema_de_reparto_alimentacion/logfile start
 
 flask --app Sistema_de_reparto_alimentacion init-db
 flask --app Sistema_de_reparto_alimentacion run --debug
