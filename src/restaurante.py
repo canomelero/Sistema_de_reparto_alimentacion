@@ -133,7 +133,7 @@ def eliminar_plato(id_plato: int, id_restaurante: int):
     cursor = get_db_cursor()
     cursor.execute("DELETE FROM plato_oferta WHERE id_plato = %s", (id_plato,))
     get_db().commit()
-    return redirect(url_for("restaurante.aniadir_plato", id=id_restaurante, eliminado=True))
+    return redirect(url_for("restaurante.aniadir_plato", id_restaurante=id_restaurante, eliminado=True))
 
 
 @bp.route('/platos/editar/<int:id_plato>/id_restaurante=<int:id_restaurante>', methods=("GET", "POST"))
@@ -164,3 +164,34 @@ def editar_plato(id_plato: int, id_restaurante: int):
 
         get_db().commit()
         return redirect(url_for("restaurante.aniadir_plato", id_restaurante=id_restaurante))
+    
+@bp.route('/mostrar_platos/<int:id_cliente>', methods=("GET", "POST"))
+def mostrar_rest_plat(id_cliente: int):
+    cursor = get_db_cursor()
+
+    cursor.execute("SELECT * FROM restaurante")
+    restaurantes = cursor.fetchall()
+    
+    restaurantes_con_platos = []
+
+    for restaurante in restaurantes:
+        cursor.execute(
+            "SELECT * FROM plato_oferta WHERE id_restaurante = %s", 
+            (restaurante['id'],)
+        )
+
+        platos = cursor.fetchall()
+        restaurantes_con_platos.append({
+            "restaurante": restaurante,
+            "platos": platos
+        })
+
+    return render_template(
+        "restaurante/restaurante_pedidos.html", 
+        restaurantes_con_platos=restaurantes_con_platos, 
+        id_cliente=id_cliente
+    )
+
+@bp.route('/anidadir_plato_pedido/<int:id_cliente>/<int:id_plato>', methods=("GET", "POST"))
+def add_plato_pedido(id_cliente: int, id_plato: int):
+    print("empty")

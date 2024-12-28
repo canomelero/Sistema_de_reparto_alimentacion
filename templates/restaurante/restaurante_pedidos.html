@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 pt-3">
+    <h2 class="mb-4 text-center">Nuestros Restaurantes</h2>
+
+    <div class="accordion shadow-sm" id="restaurantAccordion">
+        {% for restaurante in restaurantes_con_platos %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ restaurante.restaurante.id }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ restaurante.restaurante.id }}" aria-expanded="false"
+                    aria-controls="collapse{{ restaurante.restaurante.id }}">
+                    <div class="w-100">
+                        <h3 class="h5 mb-0">{{ restaurante.restaurante.restaurante }}</h3>
+                        <div class="text-muted small mt-1">
+                            <i class="bi bi-geo-alt"></i> {{ restaurante.restaurante.distancia_reparto }} km
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-clock"></i> {{ restaurante.restaurante.horario_apertura.strftime('%H:%M') }}
+                            - {{ restaurante.restaurante.horario_cierre.strftime('%H:%M') }}
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-tag"></i> {{ restaurante.restaurante.especialidad }}
+                        </div>
+                    </div>
+                </button>
+            </h2>
+
+            <div id="collapse{{ restaurante.restaurante.id }}" class="accordion-collapse collapse"
+                aria-labelledby="heading{{ restaurante.restaurante.id }}" data-bs-parent="#restaurantAccordion">
+                <div class="accordion-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for plato in restaurante.platos %}
+                        <li class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h4 class="h6 mb-2">{{ plato.nombre }}</h4>
+                                    <p class="text-muted mb-1 small">
+                                        <i class="bi bi-card-list"></i> <strong>Ingredientes:</strong> {{
+                                        plato.ingredientes }}
+                                    </p>
+                                    <p class="text-muted mb-0 small">
+                                        <i class="bi bi-clock"></i> <strong>Tiempo de preparación:</strong> {{
+                                        plato.tiempo_preparacion }} min
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                    <span class="badge bg-primary mb-2 d-block d-md-inline">{{ plato.precio }}€</span>
+                                    <form
+                                        action="{{ url_for('restaurante.add_plato_pedido', id_cliente=id_cliente, id_plato=plato.id_plato) }}"
+                                        method="POST" class="d-inline">
+                                        <button class="btn btn-success btn-sm" type="submit">
+                                            <i class="bi bi-plus-circle"></i> Añadir
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
