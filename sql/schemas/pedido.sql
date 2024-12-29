@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS pedido_incluye_reparte CASCADE;
 
 CREATE TABLE pedido_incluye_reparte (
     numero_pedido SERIAL PRIMARY KEY,
-    id_plato INT NOT NULL,
+    -- en postresql ARRAY = INT[]
+    id_plato ARRAY NOT NULL,
     id_trabajador INT NOT NULL,
     direccion_entrega VARCHAR(60),
     observaciones VARCHAR(60),
