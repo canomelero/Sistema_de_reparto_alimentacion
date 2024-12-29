@@ -18,3 +18,5 @@ CREATE TABLE factura (
     FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
 );
 
+
+

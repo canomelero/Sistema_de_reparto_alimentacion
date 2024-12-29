@@ -29,11 +29,11 @@ CREATE TABLE plato_oferta (
 
 CREATE TABLE informe_restaurante (
     id_informe SERIAL PRIMARY KEY,
-    id_restaurante INTEGER NOT NULL,
+    id_restaurante INT NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
-    tiempo_preparacion_pedidos INTEGER DEFAULT 0,
-    numero_ventas INTEGER DEFAULT 0,
+    tiempo_preparacion_pedidos INT DEFAULT 0,
+    numero_ventas INT DEFAULT 0,
     total_ingresado FLOAT DEFAULT 0.0,
     FOREIGN KEY (id_restaurante) REFERENCES restaurante(id)
 );
@@ -41,10 +41,10 @@ CREATE TABLE informe_restaurante (
 
 CREATE TABLE ventas_diarias (
     id SERIAL PRIMARY KEY,
-    id_restaurante INTEGER NOT NULL,
+    id_restaurante INT NOT NULL,
     fecha DATE NOT NULL,
-    tiempo_preparacion INTEGER,
+    tiempo_preparacion INT,
     total_ingresado FLOAT,
-    platos_vendidos INTEGER DEFAULT 0,
+    platos_vendidos INT DEFAULT 0,
     FOREIGN KEY (id_restaurante) REFERENCES restaurante(id)
 );
