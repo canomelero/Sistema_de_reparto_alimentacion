@@ -7,7 +7,8 @@ CREATE TABLE trabajador (
     email VARCHAR(60),
     nombre VARCHAR(60),
     direccion VARCHAR(60),
-    numero_telefono VARCHAR(20)
+    numero_telefono VARCHAR(20),
+    disponibilidad BOOLEAN DEFAULT true
 );
 
 CREATE TABLE informe_trabajador (

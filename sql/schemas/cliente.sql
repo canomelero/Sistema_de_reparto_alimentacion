@@ -14,7 +14,7 @@ CREATE TABLE factura (
     numero_pedido INT PRIMARY KEY,
     fecha DATE NOT NULL,
     id_cliente INT NOT NULL,   -- PONÍA EMAIL Y LO HE CAMBIADO A ID DEL CLIENTE
-    FOREIGN KEY (numero_pedido) REFERENCES pedido_incluye_reparte(numero_pedido),
+    FOREIGN KEY (numero_pedido) REFERENCES pedido_incluye_reparte(id_pedido),
     FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
 );
 

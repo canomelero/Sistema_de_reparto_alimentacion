@@ -166,6 +166,7 @@ def editar_plato(id_plato: int, id_restaurante: int):
         get_db().commit()
         return redirect(url_for("restaurante.aniadir_plato", id_restaurante=id_restaurante))
     
+
 @bp.route('/mostrar_platos/<int:id_cliente>', methods=("GET", "POST"))
 def mostrar_rest_plat(id_cliente: int):
     cursor = get_db_cursor()
@@ -187,29 +188,133 @@ def mostrar_rest_plat(id_cliente: int):
             "platos": platos
         })
 
+
+    # Savepoint aquí para cuando se empiece a añadir platos a un pedido, poder eliminar 
+    # fácilmente todo lo nuevo añadido.
+
     return render_template(
         "restaurante/restaurante_pedidos.html", 
         restaurantes_con_platos=restaurantes_con_platos, 
         id_cliente=id_cliente
     )
 
+
 @bp.route("/anidadir_plato_pedido/id_cliente=<int:id_cliente>/id_plato=<int:id_plato>"
           "/id_restaurante=<int:id_restaurante>", methods=("GET", "POST"))
 def add_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
     cursor = get_db_cursor()
 
-    # Savepoint aquí
+    if request.method != "POST":
+        return Response(status=405) # Operacion no permitida
 
-    if request.method == "POST":
-        cursor.execute("SELECT precio, tiempo_preparacion FROM plato_oferta WHERE id_plato = %s",
-                      (id_plato,))
-        resultado = cursor.fetchone()
+    resultados = obtener_datos_plato_pedido(cursor, id_plato)
+    pasar_datos_ventas_diarias(cursor, resultados, id_restaurante)
+    
+    # Comprobar si el cliente tiene un pedido activo en 'Seleccionando'
+    cursor.execute(
+        """
+        SELECT id_pedido FROM pedido_incluye_reparte 
+        WHERE estado = 'Seleccionando' AND id_pedido IN 
+        (SELECT numero_pedido FROM factura WHERE id_cliente = %s)
+        """, (id_cliente,)
+    )
+    id_pedido_seleccionando = cursor.fetchone()
 
-        cursor.execute("SELECT CURRENT_DATE")
-        fecha_actual = cursor.fetchone()
-        print(fecha_actual, "\n\n\n")
+    # Si no existe un pedido activo, lo creamos
+    if not id_pedido_seleccionando:
+        nuevos_registros_pedido_platos(cursor, resultados[2], id_cliente)
 
-        # Asociar trigger aquí para enviarlo a pedidos también y así ahorrar código
+    aniadir_valores_pedido_plato(cursor, id_cliente, id_plato)
+    # rollback en caso de error o que se cancele el pedido
+
+    get_db().commit()
+    
+    return Response(status=204) # 204 indica que ha ido todo correcto pero no devuelve nada
+
+
+@bp.route('/pagar_pedido/<int:id_cliente>', methods=("GET", "POST"))
+def finalizar_pedido(id_cliente: int):
+    cursor = get_db_cursor()
+
+    # Esta función elimina los valores suponiendo que es lo que haría la tabla temporal,
+    # no es definitivo esta sentencia.
+    cursor.execute(
+        """
+        SELECT id_pedido FROM pedido_incluye_reparte 
+        WHERE estado = 'Seleccionando' AND id_pedido IN 
+        (SELECT numero_pedido FROM factura WHERE id_cliente = %s)
+        """, (id_cliente,)
+    )
+    id_pedido_seleccionando = cursor.fetchone()
+
+    cursor.execute("DELETE FROM pedido_plato WHERE id_pedido = %s", 
+                   (id_pedido_seleccionando["id_pedido"],))
+    get_db().commit()
+    return Response(status=204)
+    
+
+def obtener_datos_plato_pedido(cursor, id_plato: int) -> tuple:
+    """Obtiene los datos necesarios para añadir plato a pedido y ventas_diarias
+
+    Parameters
+    ----------
+    cursor : psycopg2.connection.cursor
+        Cursor para ejecutar sentencia base de datos
+    id_plato : int
+        id del plato seleccionado
+
+    Returns
+    -------
+    list
+        Valores necesarios para la consulta insert y update. Valores devueltos son:
+        [tiempo_preparacion, precio, fecha actual].
+    """
+    cursor.execute("SELECT precio, tiempo_preparacion FROM plato_oferta WHERE id_plato = %s",
+                    (id_plato,))
+    resultado = cursor.fetchone()
+
+    cursor.execute("SELECT CURRENT_DATE")
+    fecha_actual = cursor.fetchone()
+
+    return [resultado["tiempo_preparacion"], resultado["precio"], fecha_actual["current_date"]]
+
+
+def pasar_datos_ventas_diarias(cursor, resultados: tuple, id_restaurante: int) -> None:
+    """Crea o actualiza los valores de ventas_diarias para luego crear informe de restaurante
+
+     Parameters
+    ----------
+    cursor : psycopg2.connection.cursor
+        Cursor para ejecutar sentencia base de datos
+    resultados : tuple
+        Valores [tiempo_preparacion, precio, fecha actual].
+    id_restaurante: int
+        ID del restaurante del plato seleccionado
+
+    Returns
+    -------
+    None
+    """
+    cursor.execute(
+        """
+        SELECT 1 FROM ventas_diarias 
+        WHERE id_restaurante = %s AND fecha = %s
+        """, 
+        (id_restaurante, resultados[2])
+    )
+    ventas_existentes = cursor.fetchone()
+
+    # Comprobar si no existe la tupla de ventas diarias para crearla
+    if not ventas_existentes:
+        cursor.execute(
+            """
+            INSERT INTO ventas_diarias (id_restaurante, fecha, tiempo_preparacion, 
+            total_ingresado, platos_vendidos) VALUES (%s, %s, %s, %s, 1)
+            """, 
+            (id_restaurante, resultados[2], resultados[0], resultados[1])
+        )
+        print("Creado ventas_diarias\n\n\n")
+    else:
         cursor.execute(
             """
             UPDATE ventas_diarias
@@ -218,30 +323,54 @@ def add_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
                 platos_vendidos = platos_vendidos + 1
             WHERE id_restaurante = %s AND fecha = %s
             """, 
-            (resultado["tiempo_preparacion"], resultado["precio"], id_restaurante, 
-             fecha_actual["current_date"], id_plato)
+            (resultados[0], resultados[1], id_restaurante, resultados[2])
         )
 
-        # Si no se ha hecho el update porque no existe el registro
-        if cursor.rowcount == 0: 
-            # Obtener el id_trabajador que esté libre.
 
 
-            # Asociar trigger aquí para crear el pedido y así evitar código extra
-            cursor.execute(
-                """
-                INSERT INTO ventas_diarias (id_restaurante, fecha, tiempo_preparacion,
-                total_ingresado, platos_vendidos)
-                VALUES (%s, %s, %s, %s, %s)
-                """, 
-                (id_restaurante, fecha_actual["current_date"], resultado["tiempo_preparacion"],
-                 resultado["precio"], 1)
-            )
-            
+def nuevos_registros_pedido_platos(cursor, fecha: str, id_cliente: int) -> None:
+    # Obtener el id_trabajador que esté libre.
+    cursor.execute("SELECT id_trabajador FROM trabajador WHERE disponibilidad = true")
+    id_trabajador = cursor.fetchone()["id_trabajador"]
+
+    # Indicar que el repartidor está ocupado ya que se asociará a este envío
+    cursor.execute("UPDATE trabajador SET disponibilidad = False WHERE id_trabajador = %s",
+                   (id_trabajador,))
+
+    # Para que quede mejor mostrar este error en el html
+    if not id_trabajador:
+        print("No se ha encontrado ningún trabajador disponible")
+        return 
+    
+    print("Seleccionado trabajador correctamente\n\n\n")
+    # crear pedido_incluye_reparte
+    cursor.execute(
+        """
+        INSERT INTO pedido_incluye_reparte (id_trabajador, estado) 
+        VALUES (%s, 'Seleccionando') RETURNING id_pedido
+        """, (id_trabajador,)
+    )
+    id_pedido = cursor.fetchone()["id_pedido"] # Obtener el id_pedido de la tupla creada
+    print("Creado pedido_incluye_reparte correctamente\n\n\n")
+
+    # Crear tabla factura. Hacer trigger para comprobar que no ha realizado más de 
+    # 5 pedidos en un mismo día
+    cursor.execute("INSERT INTO factura VALUES (%s, %s, %s)", 
+                   (id_pedido, fecha, id_cliente))
+    print("Creado factura\n\n\n")
 
 
-        # rollback en caso de error o que se cancele el pedido
-        
-        get_db().commit()
-        return Response(status=204)
-        
+def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int) -> None:
+    """ Añadir nueva tupla a la tabla temporal pedido_plato
+
+    """
+    cursor.execute(
+        """
+        SELECT numero_pedido FROM factura f
+        JOIN pedido_incluye_reparte p ON f.numero_pedido = p.id_pedido
+        WHERE p.estado = 'Seleccionando' AND id_cliente = %s
+        """, (id_cliente,)
+    )
+    id_pedido = cursor.fetchone()["numero_pedido"]
+
+    cursor.execute("INSERT INTO pedido_plato VALUES (%s, %s)", (id_pedido, id_plato))

@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS pedido_incluye_reparte CASCADE;
+DROP TABLE IF EXISTS pedido_plato CASCADE;
 
 CREATE TABLE pedido_incluye_reparte (
     id_pedido SERIAL PRIMARY KEY,
@@ -12,10 +13,8 @@ CREATE TABLE pedido_incluye_reparte (
     FOREIGN KEY (id_trabajador) REFERENCES trabajador(id_trabajador)
 );
 
-CREATE TEMP TABLE pedido_plato (
+-- Esta tabla debe de ser temporal, creada de forma normal para hacer pruebas, ya lo cambiaré.
+CREATE TABLE pedido_plato (
     id_pedido INT,
-    id_plato INT,
-    PRIMARY KEY (id_pedido, id_plato),
-    FOREIGN KEY (id_pedido) REFERENCES pedido_incluye_reparte(id_pedido),
-    FOREIGN KEY (id_plato) REFERENCES plato_oferta(id_plato)
-);
+    id_plato INT
+)

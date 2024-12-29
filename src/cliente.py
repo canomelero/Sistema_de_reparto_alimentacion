@@ -114,7 +114,7 @@ def pedidos(id):
     # Hay que filtrar primero por cliente y luego mostrar los pedidos del cliente
 
     cursor.execute(
-        "SELECT * FROM pedido_incluye_reparte WHERE numero_pedido = %s",
+        "SELECT * FROM pedido_incluye_reparte WHERE id_pedido = %s",
         (id,)
     )
 

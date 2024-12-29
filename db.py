@@ -85,8 +85,8 @@ def init_db():
             cursor.execute("COMMIT;")
 
     # Cargar todos los archivos que son triggers
-    triggers_files = [f for f in os.listdir("sql/triggers")]
-
+    triggers_files = [f for f in os.listdir("Sistema_de_reparto_alimentacion/sql/triggers")]
+    
     for t_files in triggers_files:
         print(f"Archivo: {t_files}")
         with current_app.open_resource(f"sql/triggers/{t_files}") as f:

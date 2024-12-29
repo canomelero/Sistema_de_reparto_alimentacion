@@ -62,5 +62,14 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- Botón Finalizar Pedido -->
+    <div class="text-center mt-4">
+        <form action="{{ url_for('restaurante.finalizar_pedido', id_cliente=id_cliente) }}" method="POST">
+            <button type="submit" class="btn btn-danger btn-lg">
+                <i class="bi bi-check-circle"></i> Finalizar Pedido
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}
