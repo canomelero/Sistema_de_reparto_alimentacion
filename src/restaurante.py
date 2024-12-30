@@ -197,7 +197,7 @@ def mostrar_rest_plat(id_cliente: int):
 
 @bp.route("/anidadir_plato_pedido/id_cliente=<int:id_cliente>/id_plato=<int:id_plato>"
           "/id_restaurante=<int:id_restaurante>", methods=("GET", "POST"))
-def add_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
+def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
     cursor = get_db_cursor()
 
     if request.method != "POST":
@@ -215,13 +215,16 @@ def add_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
 
     # Si no existe un pedido activo, lo creamos
     if not id_pedido_seleccionando:
-       response = nuevos_registros_pedido_platos(cursor, obtener_fecha_actual(), id_cliente)
-       if response:
-           flash(response[0], response[1])
+       resultado = nuevos_registros_pedido_platos(cursor, obtener_fecha_actual(), id_cliente)
+       if resultado:
+           flash(resultado[0], resultado[1])
            return redirect(url_for('restaurante.mostrar_rest_plat', id_cliente=id_cliente))
 
-    aniadir_valores_pedido_plato(cursor, id_cliente, id_plato)
-    # rollback en caso de error o que se cancele el pedido
+
+    resultado = aniadir_valores_pedido_plato(cursor, id_cliente, id_plato, id_restaurante)
+    if resultado:
+        flash(resultado[0], resultado[1])
+        return redirect(url_for('restaurante.mostrar_rest_plat', id_cliente=id_cliente))
     
     get_db().commit()
     # 204 indica que ha ido todo correcto pero no devuelve ningún recurso
@@ -287,10 +290,8 @@ def finalizar_pedido(id_cliente: int):
             """, (id_cliente,)
         )
         pedidos_en_preparacion_data = cursor.fetchone()
-        pedidos_en_preparacion = (pedidos_en_preparacion_data["pedidos_en_preparacion"] 
-                                  if pedidos_en_preparacion_data else 0)
 
-        tiempo_entrega_total = 5 * pedidos_en_preparacion if pedidos_en_preparacion else 5
+        tiempo_entrega_total = 5 + 5 * pedidos_en_preparacion_data["pedidos_en_preparacion"]
         fecha_actual = obtener_fecha_actual()
 
         resultados = (tiempo_preparacion_total, precio_total, fecha_actual)
@@ -335,7 +336,7 @@ def pedido_cancelado(id_cliente: int):
 
         cursor.execute(
             """
-            SELECT id_pedido FROM pedido_incluye_reparte 
+            SELECT id_pedido, id_trabajador FROM pedido_incluye_reparte 
             WHERE estado = 'Seleccionando' AND id_pedido IN 
             (SELECT numero_pedido FROM factura WHERE id_cliente = %s);
             """, (id_cliente,)
@@ -350,6 +351,9 @@ def pedido_cancelado(id_cliente: int):
             cursor.execute("DELETE FROM factura where numero_pedido = %s;", (id_pedido,))
             cursor.execute("DELETE FROM pedido_incluye_reparte WHERE id_pedido = %s;", 
                            (id_pedido,))
+            # Desvincular al trabajador del pedido
+            cursor.execute("UPDATE trabajador SET disponibilidad = true WHERE id_trabajador = %s",
+                           (id_pedido_seleccionando["id_trabajador"],))
             
             get_db().commit()
 
@@ -431,16 +435,16 @@ def pasar_datos_ventas_diarias(cursor, resultados: tuple, id_restaurante: int,
 
 
 
-def nuevos_registros_pedido_platos(cursor, fecha: str, id_cliente: int) -> tuple:
+def nuevos_registros_pedido_platos(cursor, fecha: str, id_cliente: int) -> tuple | None:
     # Obtener el id_trabajador que esté libre.
     cursor.execute("SELECT id_trabajador FROM trabajador WHERE disponibilidad = true")
     resultado = cursor.fetchone()
 
     if not resultado:
         print("Ejecutando flash\n\n\n")
-        msj = ("No se ha encontrado ningún trabajador disponible, vuelva a intentarlo más tarde",
-               "danger")
-        return msj
+        msj = "No se ha encontrado ningún trabajador disponible, vuelva a intentarlo más tarde",
+        tipo_error = "danger"
+        return (msj, tipo_error)
     
     id_trabajador = resultado["id_trabajador"]
     # Indicar que el repartidor está ocupado ya que se asociará a este envío
@@ -467,11 +471,10 @@ def nuevos_registros_pedido_platos(cursor, fecha: str, id_cliente: int) -> tuple
                    (id_pedido, fecha, id_cliente))
     print("Creado factura\n\n\n")
 
-    return ()
 
-
-def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int) -> None:
-    """ Añadir nueva tupla a la tabla temporal pedido_plato
+def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int, id_restaurante: int
+                                 ) -> tuple | None:
+    """ Añadir nueva tupla a la tabla pedido_plato
 
     """
     cursor.execute(
@@ -483,6 +486,26 @@ def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int) -> None
     )
     id_pedido = cursor.fetchone()["numero_pedido"]
 
+    # Obtener el id_restaurante del pedido si ya tiene platos
+    cursor.execute(
+        """
+        SELECT DISTINCT p.id_restaurante 
+        FROM plato_oferta p
+        JOIN pedido_plato pp ON p.id_plato = pp.id_plato
+        WHERE pp.id_pedido = %s
+        """, (id_pedido,)
+    )
+    restaurante_existente = cursor.fetchone()
+
+    if restaurante_existente:
+        id_restaurante_actual = restaurante_existente["id_restaurante"]
+
+        # Comprobar que el nuevo plato pertenece al mismo restaurante
+        if id_restaurante_actual != id_restaurante:
+            msj = "Todos los platos en un pedido deben ser del mismo restaurante."
+            tipo_error = "error"
+            return (msj, tipo_error)
+        
     cursor.execute("INSERT INTO pedido_plato VALUES (%s, %s)", (id_pedido, id_plato))
 
 
@@ -490,3 +513,5 @@ def obtener_fecha_actual()-> str:
     cursor = get_db_cursor()
     cursor.execute("SELECT CURRENT_DATE;")
     return cursor.fetchone()["current_date"]
+
+    
