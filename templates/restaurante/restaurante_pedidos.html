@@ -63,11 +63,16 @@
         {% endfor %}
     </div>
 
-    <!-- Botón Finalizar Pedido -->
-    <div class="text-center mt-4">
+    <!-- Botones Finalizar y Cancelar Pedido -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <form action="{{ url_for('restaurante.pedido_cancelado', id_cliente=id_cliente) }}" method="POST">
+            <button type="submit" class="btn btn-secondary btn-lg">
+                <i class="bi bi-x-circle"></i> Cancelar Pedido
+            </button>
+        </form>
         <form action="{{ url_for('restaurante.finalizar_pedido', id_cliente=id_cliente) }}" method="POST">
             <button type="submit" class="btn btn-danger btn-lg">
-                <i class="bi bi-check-circle"></i> Finalizar Pedido
+                <i class="bi bi-check-circle"></i> Proceder al pago
             </button>
         </form>
     </div>

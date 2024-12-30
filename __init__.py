@@ -5,6 +5,7 @@ from . import db
 from .src import cliente 
 from .src import trabajador
 from .src import restaurante
+from .src import pedido
 
 
 # # Indicación del directorio donde se encuentra el proyecto (...CRUD-Pyton-Flask/src)
@@ -20,6 +21,8 @@ print(template_dir)
 app = Flask(__name__, template_folder = template_dir)
 #app = Flask(__name__)
 
+# Para poder usar la función flash() y así mostrar errores por la página
+app.config['SECRET_KEY'] = 'psswd'
 
 #Inicializar base de datos
 db.init_app(app)
@@ -28,6 +31,7 @@ db.init_app(app)
 app.register_blueprint(cliente.bp, url_prefix = "/cliente")
 app.register_blueprint(trabajador.bp, url_prefix = "/trabajador")
 app.register_blueprint(restaurante.bp, url_prefix = "/restaurante")
+app.register_blueprint(pedido.bp, url_prefix = "/pedido")
 
 
 # Rutas de la app

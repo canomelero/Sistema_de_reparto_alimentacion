@@ -8,8 +8,8 @@ CREATE TABLE pedido_incluye_reparte (
     observaciones VARCHAR(60),
     precio FLOAT,
     estado VARCHAR(20),
-    tiempo_preparacion INT DEFAULT 20,
-    tiempo_entrega INT DEFAULT 5,
+    tiempo_preparacion INT,
+    tiempo_entrega INT,
     FOREIGN KEY (id_trabajador) REFERENCES trabajador(id_trabajador)
 );
 

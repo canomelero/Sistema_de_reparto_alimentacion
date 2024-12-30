@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 pt-3">
+    <div class="card shadow-sm">
+        <div class="card-header text-center">
+            <h3>¡Pedido Listo para Finalizar!</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Precio Total:</strong> <span class="highlight">{{ precio_total }}€</span></p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Tiempo de Preparación:</strong> <span class="highlight">{{ tiempo_preparacion_total }}
+                            minutos</span></p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Tiempo de Entrega Estimado:</strong> <span class="highlight">{{ tiempo_entrega_total }}
+                            minutos</span></p>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <!-- Botón Finalizar Pedido sin acción por ahora. Implementar función para pagar -->
+                <button class="btn btn-success btn-lg" disabled>
+                    <i class="bi bi-check-circle"></i> Finalizar Pedido
+                </button>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <p>¡Gracias por elegirnos! Tu pedido está casi listo.</p>
+        </div>
+    </div>
+
+    <!-- Botón Cancelar Pedido -->
+    <div class="d-flex justify-content-center mt-3">
+        <form action="{{ url_for('restaurante.pedido_cancelado', id_cliente=id_cliente) }}" method="POST">
+            <button type="submit" class="btn btn-secondary btn-lg">
+                <i class="bi bi-x-circle"></i> Cancelar Pedido
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
