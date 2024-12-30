@@ -8,6 +8,8 @@ from flask import url_for
 from flask import Response
 from werkzeug.exceptions import abort
 
+from datetime import datetime
+
 from ..db import get_db, get_db_cursor
 
 bp = Blueprint("restaurante", __name__)
@@ -166,6 +168,84 @@ def editar_plato(id_plato: int, id_restaurante: int):
         get_db().commit()
         return redirect(url_for("restaurante.aniadir_plato", id_restaurante=id_restaurante))
     
+@bp.route('/informe_restaurante/id_restaurante=<int:id_restaurante>', methods=("GET", "POST"))
+def crear_informe_restaurante(id_restaurante: int):
+    """
+    Genera un informe resumido de las ventas y actividades de un restaurante
+    en un rango de fechas especificado por el usuario.
+    """
+    if request.method == "POST":
+        # Recoger los datos del formulario
+        fecha_inicio = request.form.get("fecha_inicio")
+        fecha_fin = request.form.get("fecha_fin")
+
+        try:
+            # Convertir las fechas a objetos válidos
+            fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+            fecha_fin = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+        except ValueError:
+            flash("El formato de las fechas es inválido. Use el formato AAAA-MM-DD.", "danger")
+            return redirect(url_for('restaurante.add'))
+
+        if fecha_inicio > fecha_fin:
+            flash("La fecha de inicio no puede ser posterior a la fecha de fin.", "danger")
+            return redirect(url_for('restaurante.add'))
+
+        cursor = get_db_cursor()
+        # COALESCE recibe un conjunto de argumentos y devuelve el primero que no sea nulo.
+        cursor.execute(
+            """
+            SELECT 
+                COALESCE(SUM(total_ingresado), 0) AS total_ingresado,
+                COALESCE(SUM(platos_vendidos), 0) AS platos_vendidos,
+                COALESCE(SUM(tiempo_preparacion), 0) AS tiempo_preparacion
+            FROM ventas_diarias
+            WHERE id_restaurante = %s AND fecha BETWEEN %s AND %s
+            """,
+            (id_restaurante, fecha_inicio, fecha_fin)
+        )
+        informe = cursor.fetchone()
+
+        if not informe:
+            flash("No se encontraron datos para el rango de fechas especificado.", "warning")
+            return redirect(url_for('restaurante.add'))
+        
+        cursor.execute(
+            """
+            INSERT INTO informe_restaurante (id_restaurante, fecha_inicio, fecha_fin, 
+            tiempo_preparacion_pedidos, numero_ventas, total_ingresado) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (id_restaurante, fecha_inicio, fecha_fin, informe["tiempo_preparacion"],
+             informe["platos_vendidos"], informe["total_ingresado"])
+        )
+
+        get_db().commit()
+
+        cursor.execute("SELECT nombre FROM restaurante WHERE id = %s", (id_restaurante,))
+        nombre_restaurante = cursor.fetchone()["nombre"]
+
+        # Pasar los datos al HTML para mostrarlos
+        return render_template(
+            "restaurante/informe_restaurante.html",
+            id_restaurante=id_restaurante,
+            nombre_restaurante = nombre_restaurante,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            total_ingresado=informe["total_ingresado"],
+            platos_vendidos=informe["platos_vendidos"],
+            tiempo_preparacion=informe["tiempo_preparacion"]
+        )
+
+
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
+#
+# A PARTIR DE AQUÍ ES EL CÓDIGO PARA AÑADIR PLATOS A PEDIDOS, ASOCIAR
+# CLIENTE A PEDIDO, TRABAJADOR, ETC.
+#
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 @bp.route('/mostrar_platos/<int:id_cliente>', methods=("GET", "POST"))
 def mostrar_rest_plat(id_cliente: int):

@@ -23,7 +23,7 @@
             {% for restaurante in restaurantes %}
             <tr>
                 <td>{{ restaurante.id }}</td>
-                <td>{{ restaurante.restaurante }}</td>
+                <td>{{ restaurante.nombre }}</td>
                 <td>{{ restaurante.duenio }}</td>
                 <td>{{ restaurante.distancia_reparto }} km</td>
                 <td>{{ restaurante.especialidad }}</td>
@@ -35,8 +35,42 @@
                         onclick="return confirm('¿Estás seguro?');">Eliminar</a>
                     <a href="{{ url_for('restaurante.aniadir_plato', id_restaurante=restaurante.id) }}"
                         class="btn btn-info btn-sm">Menú</a>
+                    <!-- Botón para abrir el modal de fechas -->
+                    <a href="#" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalFecha{{ restaurante.id }}">Informe</a>
                 </td>
             </tr>
+
+            <!-- Modal para ingresar fechas para generar el informe -->
+            <div class="modal fade" id="modalFecha{{ restaurante.id }}" tabindex="-1"
+                aria-labelledby="modalFechaLabel{{ restaurante.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalFechaLabel{{ restaurante.id }}">Generar Informe</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form
+                                action="{{ url_for('restaurante.crear_informe_restaurante', id_restaurante=restaurante.id) }}"
+                                method="POST">
+                                <div class="mb-3">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="fecha_fin" class="form-label">Fecha de Fin</label>
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Generar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Modal para editar un restaurante -->
             <div class="modal fade" id="modal{{ restaurante.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -76,6 +110,7 @@
                     </div>
                 </div>
             </div>
+
             {% endfor %}
         </tbody>
     </table>

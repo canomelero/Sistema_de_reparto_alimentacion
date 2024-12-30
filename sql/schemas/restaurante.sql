@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS ventas_diarias CASCADE;
 -- Los valores por defectos están gestionados con el post directamente
 CREATE TABLE restaurante (
     id SERIAL PRIMARY KEY,
-    restaurante VARCHAR(30),
+    nombre VARCHAR(30),
     duenio VARCHAR(30),
     distancia_reparto INTEGER DEFAULT 2,
     especialidad VARCHAR(30),

@@ -1,5 +1,5 @@
 -- Insertar dos restaurantes
-INSERT INTO restaurante (restaurante, duenio, distancia_reparto, especialidad, 
+INSERT INTO restaurante (nombre, duenio, distancia_reparto, especialidad, 
 horario_apertura, horario_cierre) VALUES 
 ('La Pizzería', 'Juan Pérez', 3, 'Pizza', '12:00:00', '23:00:00'),
 ('El Sabor Mexicano', 'María García', 5, 'Tacos', '10:00:00', '22:00:00');
@@ -25,4 +25,13 @@ INSERT INTO cliente (nombre, email, direccion, telefono) VALUES
 INSERT INTO trabajador (email, nombre, direccion, numero_telefono, disponibilidad)
 VALUES 
 ('juan.perez@ejemplo.com', 'Juan Pérez', 'Calle Ficticia 123', '1234567890', true),
-('ana.lopez@ejemplo.com', 'Ana López', 'Avenida Principal 456', '0987654321', true);
+('ana.lopez@ejemplo.com', 'Ana López', 'Avenida Principal 456', '0987654321', true),
+('maria.gomez@ejemplo.com', 'María Gómez', 'Calle Secundaria 789', '1122334455', true),
+('carlos.ruiz@ejemplo.com', 'Carlos Ruiz', 'Avenida Las Flores 321', '2233445566', true);
+
+
+INSERT INTO ventas_diarias (id_restaurante, fecha, tiempo_preparacion, total_ingresado, platos_vendidos) 
+VALUES 
+(1, '2024-12-29', 141, 78.5, 9),
+(1, '2024-12-30', 84, 45.5, 5);
+
