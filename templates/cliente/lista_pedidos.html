@@ -8,8 +8,7 @@
 
             <table class="table table-bordered">
                 <thread>
-                    <th scope="col">Número</th>
-                    <th scope="col">ID Plato</th>
+                    <th scope="col">ID Pedido</th>
                     <th scope="col">ID Trabajador</th>
                     <th scope="col">Dirección entrega</th>
                     <th scope="col">Observaciones</th>
@@ -22,10 +21,9 @@
                 <tbody>
                     {% for pedido in pedidos %}
                         <tr>
-                            <td>{{ pedido.numero }}</td>
-                            <td>{{ pedido.id_plato }}</td>
+                            <td>{{ pedido.id_pedido }}</td>
                             <td>{{ pedido.id_trabajador }}</td>
-                            <td>{{ pedido.dir_entrega }}</td>
+                            <td>{{ pedido.direccion_entrega }}</td>
                             <td>{{ pedido.observaciones }}</td>
                             <td>{{ pedido.precio }}</td>
                             <td>{{ pedido.estado }}</td>

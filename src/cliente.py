@@ -111,11 +111,14 @@ def actualizar(id):
 def pedidos(id):
     cursor = db.get_db_cursor()
 
-    # Hay que filtrar primero por cliente y luego mostrar los pedidos del cliente
-
+    # Solo se van a listar los pedidos que realice el cliente en el día actual
+    
     cursor.execute(
-        "SELECT * FROM pedido_incluye_reparte WHERE id_pedido = %s",
-        (id,)
+        """
+        SELECT * FROM pedido_incluye_reparte WHERE id_pedido IN (
+            SELECT numero_pedido FROM factura WHERE id_cliente = %s
+            AND fecha = CURRENT_DATE)
+        """, (id,)
     )
 
     pedidos = cursor.fetchall()
@@ -128,10 +131,8 @@ def pedidos(id):
 def facturas(id):
     cursor = db.get_db_cursor()
 
-    # Hay que filtrar primero por cliente y luego mostrar los pedidos del cliente
-
     cursor.execute(
-        "SELECT * FROM factura WHERE numero_pedido = %s",
+        "SELECT * FROM factura WHERE id_cliente = %s",
         (id,)
     )
 
