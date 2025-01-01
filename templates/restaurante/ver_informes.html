@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 pt-3">
+    <h2 class="mb-4 text-center">Informes de Restaurantes</h2>
+
+    <div class="accordion shadow-sm" id="informeAccordion">
+        {% for restaurante in informes_restaurantes %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ restaurante.id_restaurante }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ restaurante.id_restaurante }}" aria-expanded="false"
+                    aria-controls="collapse{{ restaurante.id_restaurante }}">
+                    <div class="w-100">
+                        <h3 class="h5 mb-0">{{ restaurante.nombre }}</h3>
+                        <div class="text-muted small mt-1">
+                            <i class="bi bi-geo-alt"></i> Distancia Reparto: {{ restaurante.distancia_reparto }} km
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-clock"></i> Horario: {{ restaurante.horario_apertura.strftime('%H:%M') }}
+                            - {{ restaurante.horario_cierre.strftime('%H:%M') }}
+                        </div>
+                    </div>
+                </button>
+            </h2>
+
+            <div id="collapse{{ restaurante.id_restaurante }}" class="accordion-collapse collapse"
+                aria-labelledby="heading{{ restaurante.id_restaurante }}" data-bs-parent="#informeAccordion">
+                <div class="accordion-body p-3">
+                    <h4 class="h6">Informes:</h4>
+                    {% if restaurante.informes %}
+                    <ul class="list-group list-group-flush">
+                        {% for informe in restaurante.informes %}
+                        <li class="list-group-item">
+                            <p class="mb-1"><strong>Fecha:</strong> {{ informe.fecha_inicio }} hasta
+                                {{ informe.fecha_fin }}
+                            </p>
+                            <p class="mb-1"><strong>Tiempo Preparación Total:</strong> {{
+                                informe.tiempo_preparacion_pedidos }}
+                                minutos</p>
+                            <p class="mb-1"><strong>Número de Ventas:</strong> {{ informe.numero_ventas }}</p>
+                            <p class="mb-1"><strong>Total Ingresado:</strong> {{ informe.total_ingresado }}€</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No hay informes disponibles para este restaurante.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
