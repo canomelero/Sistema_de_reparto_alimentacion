@@ -30,6 +30,21 @@ def add():
                             else '09:00')
         horario_cierre = (request.form["horario_cierre"] if request.form["horario_cierre"] 
                           else '21:00')
+        
+        # Comprobar el RS3.3
+        cursor.execute(
+            """
+            SELECT nombre FROM restaurante 
+            WHERE especialidad = %s AND distancia_reparto <= 2
+            """, (especialidad)
+        )
+        resultado = cursor.fetchone()
+
+        if resultado:
+            flash(f"No puede usar la misma especialidad que {resultado["nombre"]}"
+                  "Puede alejar el restaurante 2km más para poder usar esa especialidad",
+                  "warning")
+            return redirect(url_for("restaurante/add"))
 
         cursor.execute(
             """
