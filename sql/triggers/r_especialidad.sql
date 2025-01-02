@@ -8,7 +8,7 @@ BEGIN
         SELECT 1
         FROM restaurante
         WHERE especialidad = NEW.especialidad
-          AND distancia_reparto <= 2
+          AND distancia_reparto < NEW.distancia_reparto + 2 
     ) THEN
         -- Lanzar un error si se cumple la condición
         RAISE EXCEPTION 'No puede usar la misma especialidad. Puede alejar el restaurante 

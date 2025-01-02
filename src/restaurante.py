@@ -33,7 +33,7 @@ def add():
 
         cursor.execute(
             """
-            INSERT INTO restaurante (restaurante, duenio, distancia_reparto, especialidad,
+            INSERT INTO restaurante (nombre, duenio, distancia_reparto, especialidad,
             horario_apertura, horario_cierre)
             VALUES (%s, %s, %s, %s, %s, %s)
             """,
@@ -314,8 +314,8 @@ def mostrar_rest_plat(id_cliente: int):
     )
 
 
-@bp.route("/anidadir_plato_pedido/id_cliente=<int:id_cliente>/id_plato=<int:id_plato>"
-          "/id_restaurante=<int:id_restaurante>", methods=("GET", "POST"))
+@bp.route("/anidadir_plato_pedido?id_cliente=<int:id_cliente>&id_plato=<int:id_plato>"
+          "&id_restaurante=<int:id_restaurante>#", methods=("GET", "POST"))
 def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
     """ Añade cada plato al pedido del cliente actual.
 
@@ -423,6 +423,16 @@ def finalizar_pedido(id_cliente: int):
                 WHERE id_plato = %s;
                 """, (cantidad_pedida, id_plato)
             )
+
+            cursor.execute(
+                """
+                SELECT 1 FROM plato_oferta 
+                WHERE id_plato = %s AND disponibilidad = false
+                """, (id_plato,))
+            
+            if cursor.fetchone():
+                flash("El plato seleccionado no se encuentra disponible", "danger")
+                return redirect(url_for("restaurante.mostrar_rest_plat", id_cliente=id_cliente))
 
         # Obtener el id_restaurante del restaurante el cual se están pidiendo los platos
         cursor.execute(
@@ -661,7 +671,7 @@ def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int, id_rest
 
     if not plato_disponible:
         msg = "No hay stock de ese plato en estos momentos, seleccione otro distinto"
-        tipo_error = "error"
+        tipo_error = "danger"
         return (msg, tipo_error)
 
     # Obtener id_pedido del pedido que está haciendo actualmente el cliente
@@ -691,7 +701,7 @@ def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int, id_rest
         # Comprobar que el nuevo plato pertenece al mismo restaurante
         if id_restaurante_actual != id_restaurante:
             msj = "Todos los platos en un pedido deben ser del mismo restaurante."
-            tipo_error = "error"
+            tipo_error = "danger"
             return (msj, tipo_error)
         
     cursor.execute("INSERT INTO pedido_plato VALUES (%s, %s)", (id_pedido, id_plato))
