@@ -33,7 +33,7 @@ def add():
 
         cursor.execute(
             """
-            INSERT INTO restaurante (restaurante, duenio, distancia_reparto, especialidad,
+            INSERT INTO restaurante (nombre, duenio, distancia_reparto, especialidad,
             horario_apertura, horario_cierre)
             VALUES (%s, %s, %s, %s, %s, %s)
             """,
@@ -109,13 +109,16 @@ def aniadir_plato(id_restaurante: int):
         precio = request.form["precio"]
         disponibilidad = (request.form["disponibilidad"] if request.form["disponibilidad"]
                           else "true")
+        cantidad = request.form["cantidad"] if request.form["cantidad"] else 6
 
         cursor.execute(
             """
             INSERT INTO plato_oferta (id_restaurante, nombre, ingredientes, 
-            tiempo_preparacion, precio, disponibilidad) VALUES (%s, %s, %s, %s, %s, %s)
+            tiempo_preparacion, precio, disponibilidad, cantidad) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
-            (id_restaurante, nombre, ingredientes, tiempo_preparacion, precio, disponibilidad),
+            (id_restaurante, nombre, ingredientes, tiempo_preparacion, precio, 
+             disponibilidad, cantidad),
         )
 
         get_db().commit()
@@ -158,12 +161,14 @@ def editar_plato(id_plato: int, id_restaurante: int):
         precio = (request.form["precio"] if request.form["precio"] else plato['precio'])
         disponibilidad = (request.form["disponibilidad"] if request.form["disponibilidad"] 
                           else plato['disponibilidad'])
+        cantidad = request.form["cantidad"] if request.form["cantidad"] else plato["cantidad"]
 
         cursor.execute("""
             UPDATE plato_oferta
             SET nombre = %s, ingredientes = %s, tiempo_preparacion = %s, precio = %s, 
-            disponibilidad = %s WHERE id_plato = %s
-        """, (nombre, ingredientes, tiempo_preparacion, precio, disponibilidad, id_plato))
+            disponibilidad = %s, cantidad = %s WHERE id_plato = %s
+        """, (nombre, ingredientes, tiempo_preparacion, precio, disponibilidad, cantidad,
+              id_plato))
 
         get_db().commit()
         return redirect(url_for("restaurante.aniadir_plato", id_restaurante=id_restaurante))
@@ -236,6 +241,40 @@ def crear_informe_restaurante(id_restaurante: int):
             platos_vendidos=informe["platos_vendidos"],
             tiempo_preparacion=informe["tiempo_preparacion"]
         )
+    
+@bp.route('/informes', methods=("GET", "POST"))
+def ver_informes():
+    cursor = get_db_cursor()
+
+    cursor.execute("SELECT * FROM restaurante;")
+    restaurantes = cursor.fetchall()
+
+    if not restaurantes:
+        flash("No se puede ver informes ya que no existe ningún restaurante", "warning")
+        return redirect(url_for("restaurante.add"))
+    
+    informes_restaurantes = []
+    for restaurante in restaurantes:
+        id_restaurante = restaurante['id']
+
+        cursor.execute("""
+            SELECT fecha_inicio, fecha_fin, tiempo_preparacion_pedidos, numero_ventas, 
+            total_ingresado FROM informe_restaurante WHERE id_restaurante = %s;
+        """, (id_restaurante,))
+        informes = cursor.fetchall()
+
+        # Estructura para el restaurante y sus informes
+        informes_restaurantes.append({
+            "id_restaurante": id_restaurante,
+            "nombre": restaurante['nombre'],
+            "distancia_reparto": restaurante['distancia_reparto'],
+            "horario_apertura": restaurante['horario_apertura'],
+            "horario_cierre": restaurante['horario_cierre'],
+            "informes": informes
+        })
+
+    return render_template('restaurante/ver_informes.html', informes_restaurantes=informes_restaurantes)
+
 
 
 # ------------------------------------------------------------------
@@ -275,14 +314,25 @@ def mostrar_rest_plat(id_cliente: int):
     )
 
 
-@bp.route("/anidadir_plato_pedido/id_cliente=<int:id_cliente>/id_plato=<int:id_plato>"
-          "/id_restaurante=<int:id_restaurante>", methods=("GET", "POST"))
+@bp.route("/anidadir_plato_pedido?id_cliente=<int:id_cliente>&id_plato=<int:id_plato>"
+          "&id_restaurante=<int:id_restaurante>#", methods=("GET", "POST"))
 def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
     """ Añade cada plato al pedido del cliente actual.
 
     Parameters
     ----------
-    id_
+    id_cliente: int
+        ID del cliente.
+
+    id_plato : int
+        ID del plato seleccionado.
+
+    id_restaurante:
+        ID de a que restaurante pertenece el plato seleccionado.
+
+    Returns
+    -------
+    Carga el html correspondiente a este end point.
     """
     cursor = get_db_cursor()
 
@@ -301,14 +351,15 @@ def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
 
     # Si no existe un pedido activo, lo creamos
     if not id_pedido_seleccionando:
+       # Contiene el mensaje de error en caso de que haya ocurrido algo
        resultado = nuevos_registros_pedido_platos(cursor, obtener_fecha_actual(), id_cliente)
+       # Comprobar si ha devuelvo algún tipo de error
        if resultado:
            flash(resultado[0], resultado[1])
            return redirect(url_for('restaurante.mostrar_rest_plat', id_cliente=id_cliente))
 
-
     resultado = aniadir_valores_pedido_plato(cursor, id_cliente, id_plato, id_restaurante)
-    if resultado:
+    if resultado: 
         flash(resultado[0], resultado[1])
         return redirect(url_for('restaurante.mostrar_rest_plat', id_cliente=id_cliente))
     
@@ -319,13 +370,16 @@ def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
 
 @bp.route('/pagar_pedido/<int:id_cliente>', methods=("GET", "POST"))
 def finalizar_pedido(id_cliente: int):
-    """ Actualizar valores restantes de las tuplas creadas para este pedido
+    """ Actualizar valores restantes de las tuplas creadas para este pedido.
 
     Parameters:
     -----------
     id_cliente : int
-        ID del cliente
+        ID del cliente.
 
+    Returns
+    -------
+        Cargado html correspondiente a este end point.
     """
     cursor = get_db_cursor()
 
@@ -345,7 +399,7 @@ def finalizar_pedido(id_cliente: int):
         # Calcular el precio total y el tiempo de preparación
         cursor.execute(
             """
-            SELECT p.precio, p.tiempo_preparacion
+            SELECT p.precio, p.tiempo_preparacion, p.id_plato, p.cantidad
             FROM plato_oferta p
             JOIN pedido_plato pp ON p.id_plato = pp.id_plato
             WHERE pp.id_pedido = %s;
@@ -356,6 +410,29 @@ def finalizar_pedido(id_cliente: int):
         # Para entender el funcionamiento buscar "expresiones generadoras"
         precio_total = sum([plato["precio"] for plato in platos])
         tiempo_preparacion_total = sum([plato["tiempo_preparacion"] for plato in platos])
+
+        # Restar las cantidades de platos pedidos en plato_oferta
+        for plato in platos:
+            id_plato = plato["id_plato"]
+            cantidad_pedida = plato["cantidad"]
+
+            cursor.execute(
+                """
+                UPDATE plato_oferta
+                SET cantidad = cantidad - %s
+                WHERE id_plato = %s;
+                """, (cantidad_pedida, id_plato)
+            )
+
+            cursor.execute(
+                """
+                SELECT 1 FROM plato_oferta 
+                WHERE id_plato = %s AND disponibilidad = false
+                """, (id_plato,))
+            
+            if cursor.fetchone():
+                flash("El plato seleccionado no se encuentra disponible", "danger")
+                return redirect(url_for("restaurante.mostrar_rest_plat", id_cliente=id_cliente))
 
         # Obtener el id_restaurante del restaurante el cual se están pidiendo los platos
         cursor.execute(
@@ -421,6 +498,17 @@ def finalizar_pedido(id_cliente: int):
 
 @bp.route('/cancelar_pedido/<int:id_cliente>', methods=("GET", "POST"))
 def pedido_cancelado(id_cliente: int):
+    """Cancelar el pedido en caso de que el cliente no quiera continuar con el.
+
+    Parameters
+    ----------
+    id_cliente : int
+        ID del cliente que se encuentra haciendo el pedido
+
+    Returns
+    -------
+    Código de http 204 (operación exitosa pero no devuelve ningún contenido)
+    """
     if request.method == "POST":
         cursor = get_db_cursor()
 
@@ -437,6 +525,7 @@ def pedido_cancelado(id_cliente: int):
         if id_pedido_seleccionando:
             id_pedido = id_pedido_seleccionando["id_pedido"]
 
+            # Borrar todos los valores añadidos previamente al pedido
             cursor.execute("DELETE FROM pedido_plato WHERE id_pedido = %s;", (id_pedido,))
             cursor.execute("DELETE FROM factura where numero_pedido = %s;", (id_pedido,))
             cursor.execute("DELETE FROM pedido_incluye_reparte WHERE id_pedido = %s;", 
@@ -577,6 +666,13 @@ def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int, id_rest
     None
         Para cuando no ha habido ningún problema.
     """
+    cursor.execute("SELECT disponibilidad FROM plato_oferta WHERE id_plato = %s", (id_plato,))
+    plato_disponible = cursor.fetchone()["disponibilidad"]
+
+    if not plato_disponible:
+        msg = "No hay stock de ese plato en estos momentos, seleccione otro distinto"
+        tipo_error = "danger"
+        return (msg, tipo_error)
 
     # Obtener id_pedido del pedido que está haciendo actualmente el cliente
     cursor.execute(
@@ -605,7 +701,7 @@ def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int, id_rest
         # Comprobar que el nuevo plato pertenece al mismo restaurante
         if id_restaurante_actual != id_restaurante:
             msj = "Todos los platos en un pedido deben ser del mismo restaurante."
-            tipo_error = "error"
+            tipo_error = "danger"
             return (msj, tipo_error)
         
     cursor.execute("INSERT INTO pedido_plato VALUES (%s, %s)", (id_pedido, id_plato))
