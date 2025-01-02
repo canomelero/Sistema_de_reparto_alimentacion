@@ -6,15 +6,11 @@ horario_apertura, horario_cierre) VALUES
 
 -- Insertar platos para el restaurante 'La Pizzería'
 INSERT INTO plato_oferta (id_restaurante, nombre, ingredientes, tiempo_preparacion, precio,
-disponibilidad) VALUES
-(1, 'Pizza Margarita', 'Tomate, queso mozzarella, albahaca', 15, 8.5, true),
-(1, 'Pizza Pepperoni', 'Tomate, queso mozzarella, pepperoni', 18, 9.5, true);
-
--- Insertar platos para el restaurante 'El Sabor Mexicano'
-INSERT INTO plato_oferta (id_restaurante, nombre, ingredientes, tiempo_preparacion, precio,
-disponibilidad) VALUES
-(2, 'Tacos al Pastor', 'Cerdo, piña, cilantro, cebolla', 10, 6.5, true),
-(2, 'Tacos de Carne Asada', 'Carne asada, cebolla, cilantro, salsa', 12, 7.5, true);
+disponibilidad, cantidad) VALUES
+(1, 'Pizza Margarita', 'Tomate, queso mozzarella, albahaca', 15, 8.5, true, 6),
+(1, 'Pizza Pepperoni', 'Tomate, queso mozzarella, pepperoni', 18, 9.5, true, 6),
+(2, 'Tacos al Pastor', 'Cerdo, piña, cilantro, cebolla', 10, 6.5, true, 6),
+(2, 'Tacos de Carne Asada', 'Carne asada, cebolla, cilantro, salsa', 12, 7.5, true, 6);
 
 -- Insertar dos clientes
 INSERT INTO cliente (nombre, email, direccion, telefono) VALUES

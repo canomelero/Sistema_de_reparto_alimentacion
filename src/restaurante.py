@@ -30,21 +30,6 @@ def add():
                             else '09:00')
         horario_cierre = (request.form["horario_cierre"] if request.form["horario_cierre"] 
                           else '21:00')
-        
-        # Comprobar el RS3.3
-        cursor.execute(
-            """
-            SELECT nombre FROM restaurante 
-            WHERE especialidad = %s AND distancia_reparto <= 2
-            """, (especialidad)
-        )
-        resultado = cursor.fetchone()
-
-        if resultado:
-            flash(f"No puede usar la misma especialidad que {resultado["nombre"]}"
-                  "Puede alejar el restaurante 2km más para poder usar esa especialidad",
-                  "warning")
-            return redirect(url_for("restaurante/add"))
 
         cursor.execute(
             """
@@ -124,13 +109,16 @@ def aniadir_plato(id_restaurante: int):
         precio = request.form["precio"]
         disponibilidad = (request.form["disponibilidad"] if request.form["disponibilidad"]
                           else "true")
+        cantidad = request.form["cantidad"] if request.form["cantidad"] else 6
 
         cursor.execute(
             """
             INSERT INTO plato_oferta (id_restaurante, nombre, ingredientes, 
-            tiempo_preparacion, precio, disponibilidad) VALUES (%s, %s, %s, %s, %s, %s)
+            tiempo_preparacion, precio, disponibilidad, cantidad) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
-            (id_restaurante, nombre, ingredientes, tiempo_preparacion, precio, disponibilidad),
+            (id_restaurante, nombre, ingredientes, tiempo_preparacion, precio, 
+             disponibilidad, cantidad),
         )
 
         get_db().commit()
@@ -173,12 +161,14 @@ def editar_plato(id_plato: int, id_restaurante: int):
         precio = (request.form["precio"] if request.form["precio"] else plato['precio'])
         disponibilidad = (request.form["disponibilidad"] if request.form["disponibilidad"] 
                           else plato['disponibilidad'])
+        cantidad = request.form["cantidad"] if request.form["cantidad"] else plato["cantidad"]
 
         cursor.execute("""
             UPDATE plato_oferta
             SET nombre = %s, ingredientes = %s, tiempo_preparacion = %s, precio = %s, 
-            disponibilidad = %s WHERE id_plato = %s
-        """, (nombre, ingredientes, tiempo_preparacion, precio, disponibilidad, id_plato))
+            disponibilidad = %s, cantidad = %s WHERE id_plato = %s
+        """, (nombre, ingredientes, tiempo_preparacion, precio, disponibilidad, cantidad,
+              id_plato))
 
         get_db().commit()
         return redirect(url_for("restaurante.aniadir_plato", id_restaurante=id_restaurante))
@@ -409,7 +399,7 @@ def finalizar_pedido(id_cliente: int):
         # Calcular el precio total y el tiempo de preparación
         cursor.execute(
             """
-            SELECT p.precio, p.tiempo_preparacion
+            SELECT p.precio, p.tiempo_preparacion, p.id_plato, p.cantidad
             FROM plato_oferta p
             JOIN pedido_plato pp ON p.id_plato = pp.id_plato
             WHERE pp.id_pedido = %s;
@@ -420,6 +410,19 @@ def finalizar_pedido(id_cliente: int):
         # Para entender el funcionamiento buscar "expresiones generadoras"
         precio_total = sum([plato["precio"] for plato in platos])
         tiempo_preparacion_total = sum([plato["tiempo_preparacion"] for plato in platos])
+
+        # Restar las cantidades de platos pedidos en plato_oferta
+        for plato in platos:
+            id_plato = plato["id_plato"]
+            cantidad_pedida = plato["cantidad"]
+
+            cursor.execute(
+                """
+                UPDATE plato_oferta
+                SET cantidad = cantidad - %s
+                WHERE id_plato = %s;
+                """, (cantidad_pedida, id_plato)
+            )
 
         # Obtener el id_restaurante del restaurante el cual se están pidiendo los platos
         cursor.execute(
@@ -653,6 +656,13 @@ def aniadir_valores_pedido_plato(cursor, id_cliente: int, id_plato: int, id_rest
     None
         Para cuando no ha habido ningún problema.
     """
+    cursor.execute("SELECT disponibilidad FROM plato_oferta WHERE id_plato = %s", (id_plato,))
+    plato_disponible = cursor.fetchone()["disponibilidad"]
+
+    if not plato_disponible:
+        msg = "No hay stock de ese plato en estos momentos, seleccione otro distinto"
+        tipo_error = "error"
+        return (msg, tipo_error)
 
     # Obtener id_pedido del pedido que está haciendo actualmente el cliente
     cursor.execute(

@@ -58,6 +58,13 @@
                             <option value="false">No Disponible</option>
                         </select>
                     </div>
+                    <div class="col-md-6">
+                        <label for="cantidad" class="form-label">
+                            Cantidad <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" min="0" step="1"
+                            placeholder="10" required>
+                    </div>
                 </div>
 
                 <div class="d-grid gap-2">
@@ -73,7 +80,6 @@
                 </div>
             </div>
 
-
             <div class="mt-5">
                 <h4>Platos del Restaurante</h4>
                 <table class="table table-bordered">
@@ -85,6 +91,7 @@
                             <th scope="col">Tiempo de Preparación</th>
                             <th scope="col">Precio (€)</th>
                             <th scope="col">Disponibilidad</th>
+                            <th scope="col">Cantidad</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -97,6 +104,7 @@
                             <td>{{ plato.tiempo_preparacion }} min</td>
                             <td>{{ plato.precio }}</td>
                             <td>{{ "Disponible" if plato.disponibilidad == "true" else "No Disponible" }}</td>
+                            <td>{{ plato.cantidad }}</td>
                             <td>
                                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#modal{{ plato.id_plato }}">Editar</button>
@@ -133,6 +141,9 @@
                                             <label for="precio">Precio</label>
                                             <input type="number" class="form-control mb-3" name="precio"
                                                 value="{{ plato.precio }}" min="0" step="0.01">
+                                            <label for="cantidad">Cantidad</label>
+                                            <input type="number" class="form-control mb-3" name="cantidad"
+                                                value="{{ plato.cantidad }}" min="0" step="1">
                                             <label for="disponibilidad">Disponibilidad</label>
                                             <select class="form-select mb-3" name="disponibilidad">
                                                 <option value="true" {{ "selected" if plato.disponibilidad=="true"

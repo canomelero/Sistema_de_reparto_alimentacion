@@ -23,6 +23,7 @@ CREATE TABLE plato_oferta (
     tiempo_preparacion INTEGER,
     precio FLOAT NOT NULL,
     disponibilidad BOOLEAN,
+    cantidad INTEGER,
     FOREIGN KEY (id_restaurante) REFERENCES restaurante(id)
 );
 
