@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">Informe del trabajador: {{ trabajador.nombre }}</h1>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h4>Detalles del informe</h4>
+      {% if informe %}
+        <ul>
+          {% for item in informe %}
+            <li><strong>Horas trabajadas:</strong> {{ item.horas_trabajadas }}</li>
+            <li><strong>Pedidos realizados:</strong> {{ item.numero_pedidos }}</li>
+            <li><strong>Salario:</strong> {{ item.salario }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No hay información disponible en el informe.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h4>Períodos asociados</h4>
+      {% if periodos %}
+        <ul>
+          {% for periodo in periodos %}
+            <li>{{ periodo.fecha_inicio }} - {{ periodo.fecha_fin }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No hay períodos asociados.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <a href="{{ url_for('trabajador.listar') }}" class="btn btn-primary">Volver a la lista</a>
+</div>
+{% endblock %}
