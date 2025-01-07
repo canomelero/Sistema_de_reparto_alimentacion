@@ -9,14 +9,6 @@ from flask import g
 from flask import current_app
 import click
 import os
-
-# Configuración de conexión a PostgreSQL - Juandi
-# 
-# dbname: "trabajadores",
-# user: "ddsiUser",
-# password: "ddsiPracticas",
-# host: "localhost",
-# port: 5432
  
 
 # ---------------------------- Funciones --------------------------------------------------

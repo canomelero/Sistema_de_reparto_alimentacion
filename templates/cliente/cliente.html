@@ -46,13 +46,12 @@
         <tbody>
           {% for cliente in clientes %}
           <tr>
-            <td>
-              <!-- Listar los restaurantes con un desplegable --->
+            <td>{{ cliente.id_cliente }}</td>
+            <td><!-- Listar los restaurantes con un desplegable --->
               <a href="{{ url_for('restaurante.mostrar_rest_plat', id_cliente=cliente.id_cliente) }}">
-                {{ cliente.id_cliente }}
+                {{ cliente.nombre }}
               </a>
             </td>
-            <td>{{ cliente.nombre }}</td>
             <td>{{ cliente.email }}</td>
             <td>{{ cliente.direccion }}</td>
             <td>{{ cliente.telefono }}</td>

@@ -8,7 +8,7 @@
 
             <table class="table table-bordered">
                 <thread>
-                    <th scope="col">Id Cliente</th>
+                    <th scope="col">ID Cliente</th>
                     <th scope="col">Número pedido</th>
                     <th scope="col">Fecha</th>
                 </thread>
@@ -17,7 +17,7 @@
                     {% for factura in facturas %}
                         <tr>
                             <td>{{ factura.id_cliente }}</td>
-                            <td>{{ factura.num_pedido }}</td>
+                            <td>{{ factura.numero_pedido }}</td>
                             <td>{{ factura.fecha }}</td>                
                         </tr>
                     {% endfor %}

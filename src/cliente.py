@@ -11,21 +11,21 @@ bp = Blueprint("cliente", __name__)
 #     return render_template("./base.html")
 
 # Ruta para listar los clientes de la base de datos
-@bp.route('/clientes', methods = ["GET"])
-def listar():
-    """
-    Listar todos los clientes de la app
-    """
-    cursor = db.get_db_cursor()
+# @bp.route('/clientes', methods = ["GET"])
+# def listar():
+#     """
+#     Listar todos los clientes de la app
+#     """
+#     cursor = db.get_db_cursor()
 
-    if(cursor != None):
-        cursor.execute(
-            "SELECT * FROM cliente"
-        )
+#     if(cursor != None):
+#         cursor.execute(
+#             "SELECT * FROM cliente"
+#         )
 
-        clientes = cursor.fetchall()
+#         clientes = cursor.fetchall()
 
-    return render_template('cliente/cliente.html', clientes = clientes)
+#     return render_template('cliente/cliente.html', clientes = clientes)
 
 
 # Ruta para registrar (guardar) clientes en la base de datos
@@ -51,7 +51,8 @@ def registro():
         conexion.commit()
         cursor.close()
 
-    return redirect(url_for("cliente.listar"))
+    # return redirect(url_for("cliente.listar"))
+    return redirect(url_for("home"))
 
 
 # Ruta para eliminar un cliente de la base de datos
@@ -75,7 +76,8 @@ def eliminar(id):
     conexion.commit()
     cursor.close()
 
-    return redirect(url_for("cliente.listar"))
+    # return redirect(url_for("cliente.listar"))
+    return redirect(url_for("home"))
 
 
 # Ruta para eliminar un cliente de la base de datos
@@ -103,7 +105,8 @@ def actualizar(id):
     conexion.commit()
     cursor.close()
 
-    return redirect(url_for("cliente.listar"))
+    # return redirect(url_for("cliente.listar"))
+    return redirect(url_for("home"))
 
 
 # Ruta para listar los pedidos de un cliente
@@ -111,11 +114,14 @@ def actualizar(id):
 def pedidos(id):
     cursor = db.get_db_cursor()
 
-    # Hay que filtrar primero por cliente y luego mostrar los pedidos del cliente
-
+    # Solo se van a listar los pedidos que realice el cliente en el día actual
+    
     cursor.execute(
-        "SELECT * FROM pedido_incluye_reparte WHERE id_pedido = %s",
-        (id,)
+        """
+        SELECT * FROM pedido_incluye_reparte WHERE id_pedido IN (
+            SELECT numero_pedido FROM factura WHERE id_cliente = %s
+            AND fecha = CURRENT_DATE)
+        """, (id,)
     )
 
     pedidos = cursor.fetchall()
@@ -128,10 +134,8 @@ def pedidos(id):
 def facturas(id):
     cursor = db.get_db_cursor()
 
-    # Hay que filtrar primero por cliente y luego mostrar los pedidos del cliente
-
     cursor.execute(
-        "SELECT * FROM factura WHERE numero_pedido = %s",
+        "SELECT * FROM factura WHERE id_cliente = %s",
         (id,)
     )
 

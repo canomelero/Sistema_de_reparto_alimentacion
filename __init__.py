@@ -33,11 +33,26 @@ app.register_blueprint(trabajador.bp, url_prefix = "/trabajador")
 app.register_blueprint(restaurante.bp, url_prefix = "/restaurante")
 app.register_blueprint(pedido.bp, url_prefix = "/pedido")
 
+# @app.route('/')
+# def home():
+#     return render_template('./base.html')
 
-# Rutas de la app
-@app.route('/')
+# Ruta principal de la app
+@app.route('/', methods = ["GET"])
 def home():
-    return render_template('./base.html')
+    """
+    Listar todos los clientes de la app
+    """
+    cursor = db.get_db_cursor()
+
+    if(cursor != None):
+        cursor.execute(
+            "SELECT * FROM cliente"
+        )
+
+        clientes = cursor.fetchall()
+
+    return render_template('cliente/cliente.html', clientes = clientes)
 
 
 
