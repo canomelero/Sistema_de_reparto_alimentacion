@@ -414,8 +414,16 @@ def finalizar_pedido(id_cliente: int):
         # Restar las cantidades de platos pedidos en plato_oferta
         for plato in platos:
             id_plato = plato["id_plato"]
-            cantidad_pedida = plato["cantidad"]
-
+            cursor.execute(
+                """
+                SELECT COUNT(*) AS cantidad_pedida FROM pedido_plato 
+                WHERE id_pedido = %s AND id_plato = %s
+                """,
+                (id_pedido, id_plato)
+            )
+            cantidad_pedida = cursor.fetchone()["cantidad_pedida"]
+            print(f"\n\n\n{cantidad_pedida}\n\n\n")
+            
             cursor.execute(
                 """
                 UPDATE plato_oferta
@@ -488,6 +496,7 @@ def finalizar_pedido(id_cliente: int):
         # Confirmar los cambios
         get_db().commit()
         return render_template('pedido/pago_pedido.html', 
+                               id_pedido=id_pedido,
                                precio_total=precio_total, 
                                tiempo_preparacion_total=tiempo_preparacion_total, 
                                tiempo_entrega_total=tiempo_entrega_total,

@@ -1,4 +1,4 @@
-DROP TRIGGER IF EXISTS actualizar_disponibilidad ON plato_oferta;
+DROP TRIGGER IF EXISTS trigger_actualizar_disponibilidad ON plato_oferta;
 
 -- Lógica para manejar el RS3.2
 CREATE OR REPLACE FUNCTION actualizar_disponibilidad()
