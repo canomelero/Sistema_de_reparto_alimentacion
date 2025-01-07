@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">Generar informe del trabajador: {{ nombre_trabajador }}</h1>
+
+  <form method="POST">
+    <div class="mb-3">
+      <label for="fecha_inicio" class="form-label">Fecha de inicio</label>
+      <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+    </div>
+    <div class="mb-3">
+      <label for="fecha_fin" class="form-label">Fecha de fin</label>
+      <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Generar informe</button>
+  </form>
+
+  {% if informe %}
+  <div class="card mt-4">
+    <div class="card-body">
+      <h4>Detalles del informe</h4>
+      <ul>
+        <li><strong>Horas trabajadas:</strong> {{ informe.horas_trabajadas }}</li>
+        <li><strong>Pedidos realizados:</strong> {{ informe.numero_pedidos }}</li>
+        <li><strong>Salario:</strong> {{ informe.salario }}</li>
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
