@@ -17,7 +17,7 @@ bp = Blueprint("trabajador", __name__)
 # Ruta para listar los trabajadores de la base de datos
 @bp.route("/trabajadores", methods=["GET"])
 def listar():
-    cursor = db.get_db_cursor()
+    cursor = get_db_cursor()
     trabajadores = []
 
     if cursor:
@@ -37,8 +37,8 @@ def registro():
     telefono = request.form["telefono"]
 
     if email and nombre and direccion and telefono:
-        conexion = db.get_db()
-        cursor = db.get_db_cursor()
+        conexion = get_db()
+        cursor = get_db_cursor()
 
         cursor.execute("""
             INSERT INTO trabajador (email, nombre, direccion, numero_telefono)
@@ -54,8 +54,8 @@ def registro():
 # Ruta para dar de baja a un trabajador de la base de datos
 @bp.route("/eliminar/<int:id>", methods=["GET"])
 def eliminar(id):
-    conexion = db.get_db()
-    cursor = db.get_db_cursor()
+    conexion = get_db()
+    cursor = get_db_cursor()
 
     cursor.execute("DELETE FROM trabajador WHERE id_trabajador = %s", (id,))
     conexion.commit()
@@ -71,8 +71,8 @@ def actualizar(id):
     direccion = request.form["direccion"]
     telefono = request.form["telefono"]
 
-    conexion = db.get_db()
-    cursor = db.get_db_cursor()
+    conexion = get_db()
+    cursor = get_db_cursor()
 
     cursor.execute("""
         UPDATE trabajador SET nombre = %s, direccion = %s, numero_telefono = %s
