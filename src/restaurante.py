@@ -422,7 +422,6 @@ def finalizar_pedido(id_cliente: int):
                 (id_pedido, id_plato)
             )
             cantidad_pedida = cursor.fetchone()["cantidad_pedida"]
-            print(f"\n\n\n{cantidad_pedida}\n\n\n")
             
             cursor.execute(
                 """
