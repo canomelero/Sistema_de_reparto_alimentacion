@@ -1,5 +1,16 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from .. import db
+from flask import Blueprint
+from flask import flash
+from flask import g
+from flask import redirect
+from flask import render_template
+from flask import request
+from flask import url_for
+from flask import Response
+from werkzeug.exceptions import abort
+
+from datetime import datetime
+
+from ..db import get_db, get_db_cursor
 
 bp = Blueprint("trabajador", __name__)
 
@@ -78,18 +89,32 @@ def actualizar(id):
 def crear_informe_trabajador(id_trabajador: int):
     """
     Genera un informe de las horas trabajadas y pedidos realizados por un trabajador
-    en una fecha específica.
+    en un rango de fechas específico.
     """
+    if request.method == "GET":
+        cursor = get_db_cursor()
+        cursor.execute("SELECT nombre FROM trabajador WHERE id_trabajador = %s", (id_trabajador,))
+        trabajador = cursor.fetchone()
+
+        if not trabajador:
+            flash("Trabajador no encontrado.", "danger")
+            return redirect(url_for('trabajador.listar'))
+
+        return render_template("trabajador/informe.html", nombre_trabajador=trabajador["nombre"])
+
     if request.method == "POST":
-        # Recoger la fecha del formulario
-        fecha = request.form.get("fecha")
+        fecha_inicio = request.form.get("fecha_inicio")
+        fecha_fin = request.form.get("fecha_fin")
 
         try:
-            # Convertir la fecha a un objeto válido
-            fecha = datetime.strptime(fecha, "%Y-%m-%d").date()
-        except ValueError:
-            flash("El formato de la fecha es inválido. Use el formato AAAA-MM-DD.", "danger")
-            return redirect(url_for('trabajador.registro'))
+            # Convertir las fechas a objetos válidos
+            fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+            fecha_fin = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+            if fecha_fin < fecha_inicio:
+                raise ValueError("La fecha de fin no puede ser anterior a la fecha de inicio.")
+        except ValueError as e:
+            flash(str(e), "danger")
+            return redirect(url_for('trabajador.crear_informe_trabajador', id_trabajador=id_trabajador))
 
         cursor = get_db_cursor()
 
@@ -97,23 +122,24 @@ def crear_informe_trabajador(id_trabajador: int):
         cursor.execute(
             """
             SELECT 
-                COALESCE(SUM(tiempo_entrega), 0) AS horas_trabajadas,
-                COUNT(id_pedido) AS numero_pedidos
-            FROM pedido_incluye_reparte
-            WHERE id_trabajador = %s AND DATE(fecha) = %s
+                COALESCE(SUM(p.tiempo_entrega), 0) AS horas_trabajadas,
+                COUNT(p.id_pedido) AS numero_pedidos
+            FROM pedido_incluye_reparte p
+            JOIN factura f ON p.id_pedido = f.numero_pedido
+            WHERE p.id_trabajador = %s AND f.fecha BETWEEN %s AND %s
             """,
-            (id_trabajador, fecha)
+            (id_trabajador, fecha_inicio, fecha_fin)
         )
         datos_trabajador = cursor.fetchone()
 
         if not datos_trabajador or datos_trabajador["numero_pedidos"] == 0:
-            flash("No se encontraron datos para la fecha especificada.", "warning")
-            return redirect(url_for('trabajador.registro'))
+            flash("No se encontraron datos para el rango de fechas especificado.", "warning")
+            return redirect(url_for('trabajador.crear_informe_trabajador', id_trabajador=id_trabajador))
 
-        # Calcular salario (puedes ajustar la fórmula según tu lógica)
-        salario = datos_trabajador["horas_trabajadas"] * 10  # Ejemplo: 10 unidades monetarias por hora trabajada
+        # Calcular salario
+        salario = datos_trabajador["horas_trabajadas"] * 10
 
-        # Insertar un nuevo informe en la tabla `informe_trabajador`
+        # Crear informe
         cursor.execute(
             """
             INSERT INTO informe_trabajador (id_informe, horas_trabajadas, numero_pedidos, salario) 
@@ -130,24 +156,23 @@ def crear_informe_trabajador(id_trabajador: int):
             INSERT INTO genera (id_informe, fecha_inicio, fecha_fin, id_trabajador)
             VALUES (%s, %s, %s, %s)
             """,
-            (id_informe, fecha, fecha, id_trabajador)
+            (id_informe, fecha_inicio, fecha_fin, id_trabajador)
         )
-
         get_db().commit()
 
-        cursor.execute("SELECT nombre FROM trabajador WHERE id_trabajador = %s", (id_trabajador,))
-        nombre_trabajador = cursor.fetchone()["nombre"]
-
-        # Pasar los datos al HTML para mostrarlos
         return render_template(
             "trabajador/informe.html",
-            id_trabajador=id_trabajador,
             nombre_trabajador=nombre_trabajador,
-            fecha=fecha,
-            horas_trabajadas=datos_trabajador["horas_trabajadas"],
-            numero_pedidos=datos_trabajador["numero_pedidos"],
-            salario=salario
+            informe={
+                "horas_trabajadas": datos_trabajador["horas_trabajadas"],
+                "numero_pedidos": datos_trabajador["numero_pedidos"],
+                "salario": salario
+            },
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin
         )
+
+
     
     
 
