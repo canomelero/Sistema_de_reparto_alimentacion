@@ -21,11 +21,10 @@
                 </div>
             </div>
             <div class="text-center mt-4">
-                <form action="{{ url_for('pedido.datos_restantes', id_pedido=id_pedido)}}">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        <i class="bi bi-check-circle"></i> Finalizar Pedido
-                    </button>
-                </form>
+                <!-- Botón para abrir el modal -->
+                <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#finalizarPedidoModal">
+                    <i class="bi bi-check-circle"></i> Finalizar Pedido
+                </button>
             </div>
         </div>
         <div class="card-footer text-center">
@@ -40,6 +39,36 @@
                 <i class="bi bi-x-circle"></i> Cancelar Pedido
             </button>
         </form>
+    </div>
+</div>
+
+<!-- Modal para añadir dirección y observaciones -->
+<div class="modal fade" id="finalizarPedidoModal" tabindex="-1" aria-labelledby="finalizarPedidoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="finalizarPedidoModalLabel">Finalizar Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('pedido.datos_restantes', id_pedido=id_pedido) }}" method="POST">
+                    <!-- Campo para dirección -->
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="direccion" name="direccion" required>
+                    </div>
+                    <!-- Campo para observaciones -->
+                    <div class="mb-3">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Confirmar Pedido</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
