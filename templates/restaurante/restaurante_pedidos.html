@@ -52,6 +52,14 @@
                                             <i class="bi bi-plus-circle"></i> Añadir
                                         </button>
                                     </form>
+                                    <form action="{{ url_for('restaurante.eliminar_plato_pedido', 
+                                                id_cliente = id_cliente, id_plato = plato.id_plato, 
+                                                id_restaurante = plato.id_restaurante) }}" method="POST"
+                                        class="d-inline">
+                                        <button class="btn btn-danger btn-sm" type="submit">
+                                            <i class="bi bi-dash-circle"></i> Eliminar
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </li>

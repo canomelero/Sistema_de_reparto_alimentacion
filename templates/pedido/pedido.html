@@ -12,7 +12,8 @@
         
           <div class="col">
             <label for="tipo_acceso">Tipo de Acceso:</label>
-            <select id="tipo_acceso" name="Tipo_Acceso" required style="font-size: 16px; padding: 8px 12px; height: 40px; width: 100%; border-radius: 6px; font-family: 'Chakra Petch';">
+            <select id="tipo_acceso" name="Tipo_Acceso" required style="font-size: 16px; padding: 8px 12px;
+             height: 40px; width: 100%; border-radius: 6px; font-family: 'Chakra Petch';">
                 <option value="opcion1">Trabajador</option>
                 <option value="opcion2">Restaurante</option>
                 <option value="opcion3">Cliente</option>
@@ -31,7 +32,7 @@
       </form>
     {% endif %}
       
-      {% include 'pedido/tabla_pedidos_restaurante.html' %}
+      {% include 'pedido/tabla_pedidos_filtrados.html' %}
 
           
     </div>
