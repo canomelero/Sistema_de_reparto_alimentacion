@@ -58,7 +58,9 @@ def listar_pedidos_filtrados():
 
 
     # Renderizar la plantilla con los pedidos filtrados
-    return render_template('pedido/pedido.html', pedido_incluye_reparte=pedidos)
+    return render_template('pedido/pedido.html',
+                           mostrar_encabezado=True, 
+                           pedido_incluye_reparte=pedidos)
 
 
 @bp.route('/pedidos/todos', methods = ["GET"])
@@ -82,13 +84,15 @@ def listarPedidos():
             for pedido in pedidos:
                 pedido['precio'] = f"{pedido['precio']:.2f}"  
 
-    return render_template('pedido/tabla_pedidos_restaurante.html', pedido_incluye_reparte = pedidos)
+    return render_template('pedido/pedido.html',
+                            mostrar_encabezado=False,
+                            pedido_incluye_reparte = pedidos)
 
 
 
 
-@bp.route('/pedido/datos_restantes/<int:id_pedido>', methods=["POST"])
-def datos_restantes(id_pedido):
+@bp.route('/pedido/datos_restantes?<int:id_pedido>&<int:id_cliente>', methods=["POST"])
+def datos_restantes(id_pedido, id_cliente):
     db = get_db()
     cursor = get_db_cursor()
 
@@ -108,8 +112,9 @@ def datos_restantes(id_pedido):
             SET direccion_entrega = %s, observaciones = %s, estado = %s
             WHERE id_pedido = %s;
             """,
-            (direccion_entrega, observaciones, "Pagado",  id_pedido)
+            (direccion_entrega, observaciones, "Preparando",  id_pedido)
         )
+
         db.commit()
 
         # Verificar si se actualizó algo
@@ -121,4 +126,4 @@ def datos_restantes(id_pedido):
         return f"Error al actualizar el pedido: {str(e)}", 500
 
     # Redirigir a una página de éxito o mostrar el mismo modal actualizado
-    return redirect(url_for("pedido.listarPedidos"))
+    return redirect(url_for("cliente.pedidos", id=id_cliente))

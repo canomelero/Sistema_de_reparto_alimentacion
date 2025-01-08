@@ -367,6 +367,12 @@ def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
     # 204 indica que ha ido todo correcto pero no devuelve ningún recurso
     return Response(status=204) 
 
+@bp.route('/eliminar_plato?id_cliente=<int:id_cliente>&id_plato=<int:id_plato>&'
+          'id_restaurante=<int:id_restaurante>', )
+def eliminar_plato_pedido(id_cliente : int, id_plato : int, id_restaurante : int):
+        print()
+
+
 
 @bp.route('/pagar_pedido/<int:id_cliente>', methods=("GET", "POST"))
 def finalizar_pedido(id_cliente: int):
@@ -474,6 +480,8 @@ def finalizar_pedido(id_cliente: int):
         resultados = (tiempo_preparacion_total, precio_total, fecha_actual)
         pasar_datos_ventas_diarias(cursor, resultados, id_restaurante, len(platos))
 
+        
+
         # Actualizar los valores del pedido en 'pedido_incluye_reparte' con los nuevos
         # valores calculados
         cursor.execute(
@@ -489,8 +497,20 @@ def finalizar_pedido(id_cliente: int):
             (precio_total, tiempo_preparacion_total, tiempo_entrega_total, id_pedido)
         )
 
+        
+
         # Eliminar los platos del pedido, simula el comportamiento de una tabla temporal.
-        cursor.execute("DELETE FROM pedido_plato WHERE id_pedido = %s;", (id_pedido,))
+        # cursor.execute("DELETE FROM pedido_plato WHERE id_pedido = %s;", (id_pedido,))
+
+        cursor.execute (
+            """
+            SELECT nombre, COUNT(*) as cantidad FROM plato_oferta po 
+            NATURAL JOIN pedido_plato pp 
+            WHERE pp.id_pedido = %s GROUP BY(po.nombre);
+            """,
+            (id_pedido,)
+        )
+        platos = cursor.fetchall()
 
         # Confirmar los cambios
         get_db().commit()
@@ -499,7 +519,8 @@ def finalizar_pedido(id_cliente: int):
                                precio_total=precio_total, 
                                tiempo_preparacion_total=tiempo_preparacion_total, 
                                tiempo_entrega_total=tiempo_entrega_total,
-                               id_cliente=id_cliente)
+                               id_cliente=id_cliente,
+                               platos=platos)
     
     return Response(status=500)
 

@@ -126,6 +126,13 @@ def pedidos(id):
 
     pedidos = cursor.fetchall()
 
+    if not pedidos:
+        pedidos = []
+            
+    else:
+        for pedido in pedidos:
+            pedido['precio'] = f"{pedido['precio']:.2f}"  
+
     return render_template("cliente/lista_pedidos.html", pedidos = pedidos)
 
 
@@ -135,11 +142,20 @@ def facturas(id):
     cursor = db.get_db_cursor()
 
     cursor.execute(
-        "SELECT * FROM factura WHERE id_cliente = %s",
+        """
+        SELECT id_cliente, numero_pedido, fecha, estado, precio FROM factura 
+        NATURAL JOIN pedido_incluye_reparte WHERE id_cliente = %s AND estado != 'Seleccionando'
+        """,
         (id,)
     )
-
     facturas = cursor.fetchall()
+            
+    for factura in facturas:
+        factura['precio'] = f"{factura['precio']:.2f}"    
+
+        if factura['estado'] != 'Pendiente de pago':
+            factura['estado'] = 'Pagado'
+
 
     return render_template("cliente/lista_facturas.html", facturas = facturas)
 

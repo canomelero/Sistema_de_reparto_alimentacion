@@ -4,6 +4,7 @@
 {% block content %}
 <div class="container mt-5 pt-5">
   <div class="card shadow">
+    {% if(mostrar_encabezado) %}
     <div class="card-body">
       <!-- action indica la ruta hacia la que serán dirigidos los datos -->
       <form action="/pedido/pedidos" method="POST">
@@ -28,8 +29,10 @@
           </div>
         </div>
       </form>
+    {% endif %}
       
       {% include 'pedido/tabla_pedidos_restaurante.html' %}
+
           
     </div>
   </div>
