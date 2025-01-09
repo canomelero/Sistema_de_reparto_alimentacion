@@ -1,0 +1,29 @@
+
+<div class="container mt-4">
+      <h2 class="text-center mb-5 mt-2">Mis Pedidos</h2>
+      <table class="table table-bordered">
+        <thead>
+          <th scope="col">Nº Pedido</th> 
+          <th scope="col">Dirección Entrega</th>
+          <th scope="col">Nº Platos</th>
+          <th scope="col">Precio</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Tiempo Prep</th>
+          <th scope="col">Observaciones</th>
+        </thead>
+
+        <tbody>
+          {% for pedido in pedido_incluye_reparte %}
+          <tr>
+            <td>{{ pedido.id_pedido}}</td>
+            <td>{{ pedido.direccion_entrega }}</td>
+            <td>{{ pedido.numero_platos}}</td>
+            <td>{{ pedido.precio }} €</td>
+            <td>{{ pedido.estado }}</td>
+            <td>{{ pedido.tiempo_preparacion }} min </td>
+            <td>{{ pedido.observaciones }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+</div>

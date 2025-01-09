@@ -368,6 +368,53 @@ def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
     return Response(status=204) 
 
 
+@bp.route('/eliminar_plato?id_cliente=<int:id_cliente>&id_plato=<int:id_plato>',
+           methods=("GET", "POST"))
+def eliminar_plato_pedido(id_cliente : int, id_plato : int):
+    """ Elimina un plato del pedido que se está haciendo cuando se le da a eliminar
+
+    Parameters
+    ----------
+    id_cliente : int
+        ID del cliente.
+    
+    id_plato : int
+        ID del plato a eliminar del pedido.
+
+    RETURNS
+    -------
+    Redirige al html de mostrar los restaurantes cuando se elimina un plato
+    """
+    cursor = get_db_cursor()
+    
+    cursor.execute(
+        """
+        SELECT id_pedido FROM pedido_incluye_reparte 
+        WHERE estado = 'Seleccionando' AND id_pedido IN 
+        (SELECT numero_pedido FROM factura WHERE id_cliente = %s)
+        """, (id_cliente,)
+    )
+    id_pedido_seleccionando = cursor.fetchone()["id_pedido"]
+
+    # Para eliminar solo 1 elemento,ya que no se puede usar LIMIT en DELETE
+    # Se usa ctid que es un valor que identifica a cada fila dentro de una tabla.
+    cursor.execute(
+        """
+        DELETE FROM pedido_plato
+            WHERE ctid = (
+                SELECT ctid 
+                FROM pedido_plato 
+                WHERE id_pedido = %s AND id_plato = %s
+                LIMIT 1
+            );
+        """,
+        (id_pedido_seleccionando, id_plato)
+    )
+
+    get_db().commit()
+    return redirect(url_for("restaurante.mostrar_rest_plat", id_cliente = id_cliente))
+        
+
 @bp.route('/pagar_pedido/<int:id_cliente>', methods=("GET", "POST"))
 def finalizar_pedido(id_cliente: int):
     """ Actualizar valores restantes de las tuplas creadas para este pedido.
@@ -414,8 +461,15 @@ def finalizar_pedido(id_cliente: int):
         # Restar las cantidades de platos pedidos en plato_oferta
         for plato in platos:
             id_plato = plato["id_plato"]
-            cantidad_pedida = plato["cantidad"]
-
+            cursor.execute(
+                """
+                SELECT COUNT(*) AS cantidad_pedida FROM pedido_plato 
+                WHERE id_pedido = %s AND id_plato = %s
+                """,
+                (id_pedido, id_plato)
+            )
+            cantidad_pedida = cursor.fetchone()["cantidad_pedida"]
+            
             cursor.execute(
                 """
                 UPDATE plato_oferta
@@ -440,13 +494,16 @@ def finalizar_pedido(id_cliente: int):
             SELECT p.id_restaurante
             FROM plato_oferta p
             JOIN pedido_plato pp ON p.id_plato = pp.id_plato
-            WHERE pp.id_pedido = %s
-            LIMIT 1;
+            WHERE pp.id_pedido = %s LIMIT 1;
             """, (id_pedido,)
         )
         id_restaurante_data = cursor.fetchone()
         id_restaurante = (id_restaurante_data["id_restaurante"] if id_restaurante_data 
                           else None)
+        
+        if not id_restaurante:
+            flash("No se ha encontrado el id_restaurante ya que no hay platos", "danger")
+            return redirect(url_for("restaurante.mostrar_rest_plat", id_cliente=id_cliente))
 
 
         # Calcular el número de pedidos en estado 'Preparando' en el restaurante
@@ -467,6 +524,8 @@ def finalizar_pedido(id_cliente: int):
         resultados = (tiempo_preparacion_total, precio_total, fecha_actual)
         pasar_datos_ventas_diarias(cursor, resultados, id_restaurante, len(platos))
 
+        
+
         # Actualizar los valores del pedido en 'pedido_incluye_reparte' con los nuevos
         # valores calculados
         cursor.execute(
@@ -482,16 +541,25 @@ def finalizar_pedido(id_cliente: int):
             (precio_total, tiempo_preparacion_total, tiempo_entrega_total, id_pedido)
         )
 
-        # Eliminar los platos del pedido, simula el comportamiento de una tabla temporal.
-        cursor.execute("DELETE FROM pedido_plato WHERE id_pedido = %s;", (id_pedido,))
+        cursor.execute (
+            """
+            SELECT po.nombre, po.ingredientes, COUNT(*) as cantidad FROM plato_oferta po 
+            NATURAL JOIN pedido_plato pp 
+            WHERE pp.id_pedido = %s GROUP BY po.nombre, po.ingredientes;
+            """,
+            (id_pedido,)
+        )
+        platos = cursor.fetchall()
 
         # Confirmar los cambios
         get_db().commit()
         return render_template('pedido/pago_pedido.html', 
+                               id_pedido=id_pedido,
                                precio_total=precio_total, 
                                tiempo_preparacion_total=tiempo_preparacion_total, 
                                tiempo_entrega_total=tiempo_entrega_total,
-                               id_cliente=id_cliente)
+                               id_cliente=id_cliente,
+                               platos=platos)
     
     return Response(status=500)
 
@@ -536,7 +604,7 @@ def pedido_cancelado(id_cliente: int):
             
             get_db().commit()
 
-        return Response(status=204)
+        return redirect(url_for("restaurante.mostrar_rest_plat", id_cliente = id_cliente))
 
 
 def pasar_datos_ventas_diarias(cursor, resultados: tuple, id_restaurante: int,

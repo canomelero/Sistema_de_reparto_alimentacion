@@ -11,6 +11,8 @@
                     <th scope="col">ID Cliente</th>
                     <th scope="col">Número pedido</th>
                     <th scope="col">Fecha</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Estado</th>
                 </thread>
 
                 <tbody>
@@ -18,7 +20,9 @@
                         <tr>
                             <td>{{ factura.id_cliente }}</td>
                             <td>{{ factura.numero_pedido }}</td>
-                            <td>{{ factura.fecha }}</td>                
+                            <td>{{ factura.fecha }}</td>
+                            <td>{{ factura.precio }} €</td>              
+                            <td>{{ factura.estado }}</td>            
                         </tr>
                     {% endfor %}
                 </tbody>

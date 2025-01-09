@@ -13,8 +13,10 @@ CREATE TABLE pedido_incluye_reparte (
     FOREIGN KEY (id_trabajador) REFERENCES trabajador(id_trabajador)
 );
 
--- Esta tabla debe de ser temporal, creada de forma normal para hacer pruebas, ya lo cambiaré.
 CREATE TABLE pedido_plato (
     id_pedido INT,
-    id_plato INT
+    id_plato INT,
+    FOREIGN KEY (id_pedido) REFERENCES pedido_incluye_reparte(id_pedido),
+    FOREIGN KEY (id_plato) REFERENCES plato_oferta(id_plato)
+
 )
