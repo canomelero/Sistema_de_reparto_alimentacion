@@ -144,12 +144,4 @@ def facturas(id):
     return render_template("cliente/lista_facturas.html", facturas = facturas)
 
 
-# Ruta para realizar un pedido
-# Se clicka sobre el nombre del cliente
-# Se redirige a un endpoint de resturante.py que liste los restaurantes disponibles
-# Se clicka sobre un restaurante y muestra los platos que oferta ese restaurante
-# Se clicka sobre la opción "pedir" que habrá para cada plato disponible
-# El pedido clickado se guarda en la tabla pedido 
-# El pedido se podrá pagar y una vez pagado se guarda en la tabla factura
-
 
