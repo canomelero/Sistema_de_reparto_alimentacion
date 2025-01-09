@@ -46,7 +46,8 @@ def registro():
 
         cursor.execute(
             """
-            INSERT INTO trabajador VALUES (%s, %s, %s, %s)
+            INSERT INTO trabajador (email, nombre, direccion, numero_telefono, disponibilidad) 
+            VALUES (%s, %s, %s, %s, %s)
             """,
             (email, nombre, direccion, telefono, disponible)
         )
@@ -72,9 +73,14 @@ def eliminar(id):
 # Ruta para actualizar/modificar un trabajador de la base de datos
 @bp.route("/actualizar/<int:id>", methods=["POST"])
 def actualizar(id):
-    nombre = request.form["nombre"]
-    direccion = request.form["direccion"]
-    telefono = request.form["telefono"]
+    cursor = get_db_cursor()
+    
+    cursor.execute("SELECT * FROM trabajador WHERE id_trabajador = %s", (id,))
+    datos_old = cursor.fetchone()
+
+    nombre = (request.form["nombre"] if request.form["nombre"] else datos_old["nombre"])
+    direccion = (request.form["direccion"] if request.form["direccion"] else datos_old["direccion"])
+    telefono = (request.form["telefono"] if request.form["telefono"] else datos_old["telefono"])
     disponibilidad = ("True" if request.form["disponibilidad"] == "Sí" else "False")
 
     conexion = get_db()

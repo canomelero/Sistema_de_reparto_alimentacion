@@ -46,6 +46,15 @@ def listar_pedidos_filtrados():
         # Obtener los pedidos filtrados
         pedidos = cursor.fetchall()
 
+        for pedido in pedidos:
+            cursor.execute(
+                """
+                SELECT COUNT(*) AS num_platos FROM pedido_plato WHERE id_pedido = %s;
+                """,
+                (pedido["id_pedido"],)
+            )
+            pedido["numero_platos"] = cursor.fetchone()["num_platos"]
+
 
     # Renderizar la plantilla con los pedidos filtrados
     return render_template('pedido/pedido.html',
@@ -74,6 +83,15 @@ def listar_pedidos():
         for pedido in pedidos:
             pedido['precio'] = f"{pedido['precio']:.2f}"  
 
+    for pedido in pedidos:
+        cursor.execute(
+            """
+            SELECT COUNT(*) AS num_platos FROM pedido_plato WHERE id_pedido = %s;
+            """,
+            (pedido["id_pedido"],)
+        )
+        pedido["numero_platos"] = cursor.fetchone()["num_platos"]
+
     return render_template('pedido/pedido.html',
                             mostrar_encabezado=False,
                             pedido_incluye_reparte = pedidos)
@@ -91,7 +109,7 @@ def datos_restantes(id_pedido):
     observaciones = request.form.get("observaciones")
 
     # Validar datos
-    if not direccion_entrega or not observaciones:
+    if not direccion_entrega:
         return "Datos inválidos", 400
 
     try:
@@ -131,6 +149,10 @@ def modificar_pedido_trabajador(id_pedido):
             raise ValueError("El estado indicado no existe, debe de ser En reparto o Entregado")
 
         cursor.execute(
+            "ALTER TABLE pedido_incluye_reparte DISABLE TRIGGER trg_validar_modificacion_pedido;"
+        )
+
+        cursor.execute(
             """
             UPDATE pedido_incluye_reparte 
             SET estado = %s
@@ -139,6 +161,9 @@ def modificar_pedido_trabajador(id_pedido):
             (estado , id_pedido)
         )
 
+        cursor.execute(
+            "ALTER TABLE pedido_incluye_reparte ENABLE TRIGGER trg_validar_modificacion_pedido;"
+        )
         db.commit()
 
         # Verificar si se actualizó algo
@@ -161,7 +186,7 @@ def modificar_pedido_cliente(id_pedido, id_cliente):
     direccion_entrega = request.form.get("direccion")
     observaciones = request.form.get("observaciones")
 
-    if not direccion_entrega or not observaciones:
+    if not direccion_entrega:
         return "Datos inválidos", 400
 
     try:
