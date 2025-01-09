@@ -79,15 +79,8 @@ def listar_pedidos():
                             pedido_incluye_reparte = pedidos)
 
 
-<<<<<<< HEAD
 @bp.route('/pedido/datos_restantes?<int:id_pedido>&<int:id_cliente>', methods=["POST"])
 def datos_restantes(id_pedido, id_cliente):
-=======
-
-
-@bp.route('/pedido/datos_restantes?<int:id_pedido>', methods=["POST"])
-def datos_restantes(id_pedido):
->>>>>>> main
     db = get_db()
     cursor = get_db_cursor()
 
@@ -119,12 +112,6 @@ def datos_restantes(id_pedido):
         db.rollback()
         return f"Error al actualizar el pedido: {str(e)}", 500
 
-<<<<<<< HEAD
-    # Redirigir a una página de éxito o mostrar el mismo modal actualizado
-    return redirect(url_for("cliente.pedidos", id=id_cliente))
-
-
-=======
     # Redirigir a la página de inicio
     return redirect("/")
 
@@ -196,4 +183,3 @@ def modificar_pedido_cliente(id_pedido, id_cliente):
         return f"Error al actualizar el pedido: {str(e)}", 500
 
     return redirect(url_for("cliente.pedidos", id = id_cliente))
->>>>>>> main

@@ -31,55 +31,10 @@
                         <td>{{ pedido.tiempo_preparacion }} min</td>
                         <td>{{ pedido.tiempo_entrega }} min</td>
                         <td>
-<<<<<<< HEAD
                             <a href="{{ url_for('cliente.pedidos', id = cliente.id_cliente) }}"
                                 class="btn btn-success btn-sm">Modificar</a>
                         </td>
                     </tr>
-=======
-                            <button class="btn btn-primary btn-sm" id="btn-edit{{ pedido.id_pedido }}"
-                                data-bs-toggle="modal" data-bs-target="#modal{{ pedido.id_pedido }}">Modificar</button>
-                        </td>
-                    </tr>
-
-                    <!-- Ventana modal que permite la modificación de los datos-->
-                    <div class="modal fade" id="modal{{ pedido.id_pedido }}" tabindex="-1"
-                        aria-labelledby="modificarPedidoModalClienteLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="modificarPedidoModalClienteLabel">Finalizar Pedido</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form
-                                        action="{{ url_for('pedido.modificar_pedido_cliente', id_pedido=pedido.id_pedido, id_cliente = id_cliente) }}"
-                                        method="POST">
-                                        <!-- Campo para dirección -->
-                                        <div class="mb-3">
-                                            <label for="direccion" class="form-label">Dirección</label>
-                                            <input type="text" class="form-control" id="direccion" name="direccion"
-                                                required>
-                                        </div>
-                                        <!-- Campo para observaciones -->
-                                        <div class="mb-3">
-                                            <label for="observaciones" class="form-label">Observaciones</label>
-                                            <textarea class="form-control" id="observaciones" name="observaciones"
-                                                rows="3"></textarea>
-                                        </div>
-                                        <!-- Botón de cancelar -->
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-success">Confirmar cambios</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
->>>>>>> main
                     {% endfor %}
                 </tbody>
             </table>

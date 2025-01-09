@@ -145,9 +145,4 @@ def facturas(id):
     return render_template("cliente/lista_facturas.html", facturas = facturas)
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> main
 
