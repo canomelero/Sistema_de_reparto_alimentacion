@@ -6,28 +6,6 @@ from .. import db
 bp = Blueprint("cliente", __name__)
 
 
-# @bp.route("/")
-# def index():
-#     return render_template("./base.html")
-
-# Ruta para listar los clientes de la base de datos
-# @bp.route('/clientes', methods = ["GET"])
-# def listar():
-#     """
-#     Listar todos los clientes de la app
-#     """
-#     cursor = db.get_db_cursor()
-
-#     if(cursor != None):
-#         cursor.execute(
-#             "SELECT * FROM cliente"
-#         )
-
-#         clientes = cursor.fetchall()
-
-#     return render_template('cliente/cliente.html', clientes = clientes)
-
-
 # Ruta para registrar (guardar) clientes en la base de datos
 @bp.route("/registro", methods = ["POST"])
 def registro():
@@ -51,7 +29,6 @@ def registro():
         conexion.commit()
         cursor.close()
 
-    # return redirect(url_for("cliente.listar"))
     return redirect(url_for("home"))
 
 
@@ -76,7 +53,6 @@ def eliminar(id):
     conexion.commit()
     cursor.close()
 
-    # return redirect(url_for("cliente.listar"))
     return redirect(url_for("home"))
 
 
@@ -105,7 +81,6 @@ def actualizar(id):
     conexion.commit()
     cursor.close()
 
-    # return redirect(url_for("cliente.listar"))
     return redirect(url_for("home"))
 
 
@@ -115,7 +90,6 @@ def pedidos(id):
     cursor = db.get_db_cursor()
 
     # Solo se van a listar los pedidos que realice el cliente en el día actual
-    
     cursor.execute(
         """
         SELECT * FROM pedido_incluye_reparte WHERE id_pedido IN (
@@ -133,7 +107,7 @@ def pedidos(id):
         for pedido in pedidos:
             pedido['precio'] = f"{pedido['precio']:.2f}"  
 
-    return render_template("cliente/lista_pedidos.html", pedidos = pedidos)
+    return render_template("cliente/lista_pedidos.html", pedidos = pedidos, id_cliente = id)
 
 
 # Ruta para listar las facturas de un cliente
@@ -143,14 +117,25 @@ def facturas(id):
 
     cursor.execute(
         """
-        SELECT id_cliente, numero_pedido, fecha, estado, precio FROM factura 
+        SELECT id_cliente, numero_pedido, fecha, estado FROM factura 
         NATURAL JOIN pedido_incluye_reparte WHERE id_cliente = %s AND estado != 'Seleccionando'
+        GROUP BY id_cliente, numero_pedido, fecha, estado
         """,
         (id,)
     )
     facturas = cursor.fetchall()
+
+    print(f"\n\n\n {facturas} \n\n\n")
             
     for factura in facturas:
+        # Obtener precio de cada id_pedido
+        cursor.execute(
+        """
+        SELECT SUM(precio) as precio FROM pedido_incluye_reparte WHERE id_pedido = %s
+        """,
+        (factura["numero_pedido"],)
+        )
+        factura["precio"] = cursor.fetchone()["precio"]
         factura['precio'] = f"{factura['precio']:.2f}"    
 
         if factura['estado'] != 'Pendiente de pago':
@@ -160,4 +145,9 @@ def facturas(id):
     return render_template("cliente/lista_facturas.html", facturas = facturas)
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> main
 

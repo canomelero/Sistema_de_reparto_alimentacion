@@ -62,12 +62,6 @@ def init_db():
         None
     """
     cursor = get_db_cursor()
-
-    # path = os.getcwd() + "/sql/schemas/cliente.sql"
-
-    # with open(path, "r") as file:
-    #     cursor.execute(file.read())
-    #     cursor.execute('COMMIT;')
     schemas = ["restaurante.sql", "trabajador.sql", "pedido.sql", "cliente.sql"]
 
     for schema in schemas:
@@ -76,7 +70,7 @@ def init_db():
             cursor.execute(f.read().decode("utf8"))
             cursor.execute("COMMIT;")
 
-    # Cargar todos los archivos que son triggers
+    # Cargar todos los archivos del directorio sql/triggers
     triggers_files = [f for f in os.listdir("Sistema_de_reparto_alimentacion/sql/triggers")]
     
     for t_files in triggers_files:
@@ -100,7 +94,7 @@ def init_db_command():
         None    
     """
     init_db()
-    click.echo("Base de Datos inicializada")    # Similar a "print()"
+    click.echo("Base de Datos inicializada")
 
 
 def close_db(exc = None):
@@ -131,6 +125,8 @@ def init_app(app):
     Return:
         None
     """
-    app.teardown_appcontext(close_db)   # Asocia la función close_db con el evento teardown
-    app.cli.add_command(init_db_command)    # Registra un comando personalizado que se ejecuta desde
-                                            # la terminal para inicializar la base de datos
+    # Asocia la función close_db con el evento teardown
+    app.teardown_appcontext(close_db)
+    # Registra un comando personalizado que se ejecuta desde
+    # la terminal para inicializar la base de datos 
+    app.cli.add_command(init_db_command)    

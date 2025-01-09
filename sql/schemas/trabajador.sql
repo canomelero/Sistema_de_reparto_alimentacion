@@ -12,8 +12,8 @@ CREATE TABLE trabajador (
 );
 
 CREATE TABLE informe_trabajador (
-    id_informe INT PRIMARY KEY,
-    horas_trabajadas INT DEFAULT 0,
+    id_informe SERIAL PRIMARY KEY,
+    minutos_trabajados INT DEFAULT 0,
     numero_pedidos INT DEFAULT 0,
     salario INT
 );

@@ -20,30 +20,20 @@ def listar_pedidos_filtrados():
     if request.method == "POST":
         # Obtener los datos del formulario
         tipo_acceso = request.form.get('Tipo_Acceso')
-        identificador = request.form.get('Identificador')
-
+        identificador = (request.form.get('Identificador') if request.form.get("Identificador") 
+                         else 0)
         cursor = get_db_cursor()
 
-        # Asegurarse de que los datos del formulario estén presentes
-        if not tipo_acceso or not identificador:
-            return "Datos incompletos", 400
-
-        # Definir la consulta SQL según el tipo de acceso
-        if tipo_acceso == "opcion1":  # Trabajador
+        # Trabajador
+        if tipo_acceso == "opcion1":  
             cursor.execute(
                 """
                 SELECT * FROM pedido_incluye_reparte
                 WHERE id_trabajador = %s
                 """, (identificador,)
             )
-        elif tipo_acceso == "opcion2":  # Restaurante
-            cursor.execute(
-                """
-                SELECT * FROM pedido_incluye_reparte
-                WHERE id_restaurante = %s
-                """, (identificador,)  # Asegúrate de que esta columna exista
-            )
-        elif tipo_acceso == "opcion3":  # Cliente
+        # Cliente
+        elif tipo_acceso == "opcion2":  
             cursor.execute(
                 """
                 SELECT * FROM pedido_incluye_reparte WHERE id_pedido IN (
@@ -51,7 +41,7 @@ def listar_pedidos_filtrados():
                 """, (identificador,)
             )
         else:
-            return "Tipo de acceso inválido", 400
+            return redirect(url_for("pedido.listar_pedidos"))
 
         # Obtener los pedidos filtrados
         pedidos = cursor.fetchall()
@@ -64,7 +54,7 @@ def listar_pedidos_filtrados():
 
 
 @bp.route('/pedidos/todos', methods = ["GET"])
-def listarPedidos():
+def listar_pedidos():
     cursor = get_db_cursor()
 
     if(cursor != None):
@@ -75,22 +65,29 @@ def listarPedidos():
     )
 
         
-        pedidos = cursor.fetchall()
+    pedidos = cursor.fetchall()
 
-        if not pedidos:
-            pedidos = []
+    if not pedidos:
+        pedidos = []
 
-        else:
-            for pedido in pedidos:
-                pedido['precio'] = f"{pedido['precio']:.2f}"  
+    else:
+        for pedido in pedidos:
+            pedido['precio'] = f"{pedido['precio']:.2f}"  
 
     return render_template('pedido/pedido.html',
                             mostrar_encabezado=False,
                             pedido_incluye_reparte = pedidos)
 
 
+<<<<<<< HEAD
 @bp.route('/pedido/datos_restantes?<int:id_pedido>&<int:id_cliente>', methods=["POST"])
 def datos_restantes(id_pedido, id_cliente):
+=======
+
+
+@bp.route('/pedido/datos_restantes?<int:id_pedido>', methods=["POST"])
+def datos_restantes(id_pedido):
+>>>>>>> main
     db = get_db()
     cursor = get_db_cursor()
 
@@ -103,7 +100,6 @@ def datos_restantes(id_pedido, id_cliente):
         return "Datos inválidos", 400
 
     try:
-        # Ejecutar el UPDATE en la base de datos
         cursor.execute(
             """
             UPDATE pedido_incluye_reparte 
@@ -123,7 +119,81 @@ def datos_restantes(id_pedido, id_cliente):
         db.rollback()
         return f"Error al actualizar el pedido: {str(e)}", 500
 
+<<<<<<< HEAD
     # Redirigir a una página de éxito o mostrar el mismo modal actualizado
     return redirect(url_for("cliente.pedidos", id=id_cliente))
 
 
+=======
+    # Redirigir a la página de inicio
+    return redirect("/")
+
+
+@bp.route('/pedido/trabajador?id_pedido=<int:id_pedido>', methods=['GET', 'POST'])
+def modificar_pedido_trabajador(id_pedido):
+    db = get_db()
+    cursor = get_db_cursor()
+    estado = request.form['estado'] 
+
+    try:
+        posibles_estados = ("En reparto", "Entregado")
+
+        if estado not in posibles_estados:
+            raise ValueError("El estado indicado no existe, debe de ser En reparto o Entregado")
+
+        cursor.execute(
+            """
+            UPDATE pedido_incluye_reparte 
+            SET estado = %s
+            WHERE id_pedido = %s;
+            """,
+            (estado , id_pedido)
+        )
+
+        db.commit()
+
+        # Verificar si se actualizó algo
+        if cursor.rowcount == 0:
+            return f"No se encontró el pedido con ID {id_pedido}", 404
+
+    except ValueError as e:
+        flash(str(e), "danger")
+    except Exception as e:
+        db.rollback()
+        return f"Error al actualizar el pedido: {str(e)}", 500
+    finally:
+        return redirect(url_for("pedido.listar_pedidos"))
+
+
+@bp.route('/pedido/cliente?id_pedido=<int:id_pedido>&id_cliente=<int:id_cliente>', methods=['GET','POST'])
+def modificar_pedido_cliente(id_pedido, id_cliente):
+    db = get_db()
+    cursor = get_db_cursor()
+    direccion_entrega = request.form.get("direccion")
+    observaciones = request.form.get("observaciones")
+
+    if not direccion_entrega or not observaciones:
+        return "Datos inválidos", 400
+
+    try:
+        cursor.execute(
+            """
+            UPDATE pedido_incluye_reparte 
+            SET direccion_entrega = %s, observaciones = %s
+            WHERE id_pedido = %s;
+            """,
+            (direccion_entrega, observaciones, id_pedido)
+        )
+
+        db.commit()
+
+        # Verificar si se actualizó algo
+        if cursor.rowcount == 0:
+            return f"No se encontró el pedido con ID {id_pedido}", 404
+
+    except Exception as e:
+        db.rollback()
+        return f"Error al actualizar el pedido: {str(e)}", 500
+
+    return redirect(url_for("cliente.pedidos", id = id_cliente))
+>>>>>>> main

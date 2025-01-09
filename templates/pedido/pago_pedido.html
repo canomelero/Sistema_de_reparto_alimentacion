@@ -7,7 +7,7 @@
             <h3>¡Pedido Listo para Finalizar!</h3>
         </div>
         <div class="card-body">
-            <!-- Información General del Pedido -->
+            <!-- Información general del pedido -->
             <div class="row">
                 <div class="col-md-4">
                     <p><strong>Precio Total:</strong> <span class="highlight">{{ precio_total }}€</span></p>
@@ -22,7 +22,7 @@
                 </div>
             </div>
 
-            <!-- Lista de Platos -->
+            <!-- Lista de platos pedidos -->
             <div class="mt-4">
                 <h4 class="mb-3">Resumen del Pedido</h4>
                 <ul class="list-group">
@@ -74,6 +74,7 @@
                         <label for="observaciones" class="form-label">Observaciones</label>
                         <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
                     </div>
+                    <!-- Botón de confirmar pedido -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-success">Confirmar Pedido</button>

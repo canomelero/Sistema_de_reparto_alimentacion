@@ -24,6 +24,9 @@ def listar():
         cursor.execute("SELECT * FROM trabajador")
         trabajadores = cursor.fetchall()
         cursor.close()
+    
+    for trabajador in trabajadores:
+        trabajador["disponibilidad"] = ("Sí" if trabajador["disponibilidad"] else "No")
 
     return render_template("trabajador/trabajador.html", trabajadores=trabajadores)
 
@@ -35,15 +38,17 @@ def registro():
     nombre = request.form["nombre"]
     direccion = request.form["direccion"]
     telefono = request.form["telefono"]
+    disponible = ("True" if request.form["disponible"] == "Sí" else "False")
 
     if email and nombre and direccion and telefono:
         conexion = get_db()
         cursor = get_db_cursor()
 
-        cursor.execute("""
-            INSERT INTO trabajador (email, nombre, direccion, numero_telefono)
-            VALUES (%s, %s, %s, %s)""",
-            (email, nombre, direccion, telefono)
+        cursor.execute(
+            """
+            INSERT INTO trabajador VALUES (%s, %s, %s, %s)
+            """,
+            (email, nombre, direccion, telefono, disponible)
         )
         conexion.commit()
         cursor.close()
@@ -70,14 +75,15 @@ def actualizar(id):
     nombre = request.form["nombre"]
     direccion = request.form["direccion"]
     telefono = request.form["telefono"]
+    disponibilidad = ("True" if request.form["disponibilidad"] == "Sí" else "False")
 
     conexion = get_db()
     cursor = get_db_cursor()
 
     cursor.execute("""
-        UPDATE trabajador SET nombre = %s, direccion = %s, numero_telefono = %s
+        UPDATE trabajador SET nombre = %s, direccion = %s, numero_telefono = %s, disponibilidad = %s
         WHERE id_trabajador = %s""",
-        (nombre, direccion, telefono, id)
+        (nombre, direccion, telefono, disponibilidad, id)
     )
     conexion.commit()
     cursor.close()
@@ -91,6 +97,8 @@ def crear_informe_trabajador(id_trabajador: int):
     Genera un informe de las horas trabajadas y pedidos realizados por un trabajador
     en un rango de fechas específico.
     """
+    trabajador = ""
+    
     if request.method == "GET":
         cursor = get_db_cursor()
         cursor.execute("SELECT nombre FROM trabajador WHERE id_trabajador = %s", (id_trabajador,))
@@ -122,7 +130,7 @@ def crear_informe_trabajador(id_trabajador: int):
         cursor.execute(
             """
             SELECT 
-                COALESCE(SUM(p.tiempo_entrega), 0) AS horas_trabajadas,
+                COALESCE(SUM(p.tiempo_entrega), 0) AS minutos_trabajados,
                 COUNT(p.id_pedido) AS numero_pedidos
             FROM pedido_incluye_reparte p
             JOIN factura f ON p.id_pedido = f.numero_pedido
@@ -131,26 +139,26 @@ def crear_informe_trabajador(id_trabajador: int):
             (id_trabajador, fecha_inicio, fecha_fin)
         )
         datos_trabajador = cursor.fetchone()
+        print(f"\n\n\n {datos_trabajador}\n\n\n")
 
         if not datos_trabajador or datos_trabajador["numero_pedidos"] == 0:
             flash("No se encontraron datos para el rango de fechas especificado.", "warning")
             return redirect(url_for('trabajador.crear_informe_trabajador', id_trabajador=id_trabajador))
 
         # Calcular salario
-        salario = datos_trabajador["horas_trabajadas"] * 10
+        salario = datos_trabajador["minutos_trabajados"] * 10
 
         # Crear informe
         cursor.execute(
             """
-            INSERT INTO informe_trabajador (id_informe, horas_trabajadas, numero_pedidos, salario) 
-            VALUES (DEFAULT, %s, %s, %s)
-            RETURNING id_informe
+            INSERT INTO informe_trabajador (minutos_trabajados, numero_pedidos, salario) 
+            VALUES (%s, %s, %s) RETURNING id_informe;
             """,
-            (datos_trabajador["horas_trabajadas"], datos_trabajador["numero_pedidos"], salario)
+            (datos_trabajador["minutos_trabajados"], datos_trabajador["numero_pedidos"], salario)
         )
         id_informe = cursor.fetchone()["id_informe"]
 
-        # Vincular el informe al trabajador en la tabla `genera`
+        # Vincular el informe al trabajador en la tabla 'genera'
         cursor.execute(
             """
             INSERT INTO genera (id_informe, fecha_inicio, fecha_fin, id_trabajador)
@@ -162,9 +170,9 @@ def crear_informe_trabajador(id_trabajador: int):
 
         return render_template(
             "trabajador/informe.html",
-            nombre_trabajador=nombre_trabajador,
+            nombre_trabajador=trabajador,
             informe={
-                "horas_trabajadas": datos_trabajador["horas_trabajadas"],
+                "minutos_trabajados": datos_trabajador["minutos_trabajados"],
                 "numero_pedidos": datos_trabajador["numero_pedidos"],
                 "salario": salario
             },

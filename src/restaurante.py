@@ -84,7 +84,7 @@ def editar(id: int):
         cursor.execute(
             """
             UPDATE restaurante
-            SET restaurante = %s, duenio = %s, distancia_reparto = %s, especialidad = %s,
+            SET nombre = %s, duenio = %s, distancia_reparto = %s, especialidad = %s,
                 horario_apertura = %s, horario_cierre = %s
             WHERE id = %s
             """, 
@@ -277,6 +277,9 @@ def ver_informes():
 
 
 
+
+
+# ------------------------------------------------------------------
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
 #
@@ -285,9 +288,16 @@ def ver_informes():
 #
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
+# ------------------------------------------------------------------
+
+
+
+
 
 @bp.route('/mostrar_platos/<int:id_cliente>', methods=("GET", "POST"))
 def mostrar_rest_plat(id_cliente: int):
+    """ Mostrar todos los platos de cada restaurante
+    """
     cursor = get_db_cursor()
 
     cursor.execute("SELECT * FROM restaurante")
