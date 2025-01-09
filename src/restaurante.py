@@ -541,16 +541,11 @@ def finalizar_pedido(id_cliente: int):
             (precio_total, tiempo_preparacion_total, tiempo_entrega_total, id_pedido)
         )
 
-        
-
-        # Eliminar los platos del pedido, simula el comportamiento de una tabla temporal.
-        # cursor.execute("DELETE FROM pedido_plato WHERE id_pedido = %s;", (id_pedido,))
-
         cursor.execute (
             """
-            SELECT nombre, COUNT(*) as cantidad FROM plato_oferta po 
+            SELECT po.nombre, po.ingredientes, COUNT(*) as cantidad FROM plato_oferta po 
             NATURAL JOIN pedido_plato pp 
-            WHERE pp.id_pedido = %s GROUP BY(po.nombre);
+            WHERE pp.id_pedido = %s GROUP BY po.nombre, po.ingredientes;
             """,
             (id_pedido,)
         )
@@ -588,7 +583,7 @@ def pedido_cancelado(id_cliente: int):
         cursor.execute(
             """
             SELECT id_pedido, id_trabajador FROM pedido_incluye_reparte 
-            WHERE estado = 'Seleccionando' OR estado = 'Pendiente de pago' AND id_pedido IN 
+            WHERE estado = 'Seleccionando' AND id_pedido IN 
             (SELECT numero_pedido FROM factura WHERE id_cliente = %s);
             """, (id_cliente,)
         )

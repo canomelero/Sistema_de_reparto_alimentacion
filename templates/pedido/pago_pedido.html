@@ -7,6 +7,7 @@
             <h3>¡Pedido Listo para Finalizar!</h3>
         </div>
         <div class="card-body">
+            <!-- Información General del Pedido -->
             <div class="row">
                 <div class="col-md-4">
                     <p><strong>Precio Total:</strong> <span class="highlight">{{ precio_total }}€</span></p>
@@ -20,9 +21,27 @@
                             minutos</span></p>
                 </div>
             </div>
+
+            <!-- Lista de Platos -->
+            <div class="mt-4">
+                <h4 class="mb-3">Resumen del Pedido</h4>
+                <ul class="list-group">
+                    {% for plato in platos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-1">{{ plato.nombre }}</h5>
+                            <small class="text-muted">Ingredientes: {{ plato.ingredientes }}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">x{{ plato.cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Botón Finalizar Pedido -->
             <div class="text-center mt-4">
-                <!-- Botón para abrir el modal -->
-                <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#finalizarPedidoModal">
+                <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal"
+                    data-bs-target="#finalizarPedidoModal">
                     <i class="bi bi-check-circle"></i> Finalizar Pedido
                 </button>
             </div>
@@ -31,19 +50,11 @@
             <p>¡Gracias por elegirnos! Tu pedido está casi listo.</p>
         </div>
     </div>
-
-    <!-- Botón Cancelar Pedido -->
-    <div class="d-flex justify-content-center mt-3">
-        <form action="{{ url_for('restaurante.pedido_cancelado', id_cliente=id_cliente) }}" method="POST">
-            <button type="submit" class="btn btn-secondary btn-lg">
-                <i class="bi bi-x-circle"></i> Cancelar Pedido
-            </button>
-        </form>
-    </div>
 </div>
 
 <!-- Modal para añadir dirección y observaciones -->
-<div class="modal fade" id="finalizarPedidoModal" tabindex="-1" aria-labelledby="finalizarPedidoModalLabel" aria-hidden="true">
+<div class="modal fade" id="finalizarPedidoModal" tabindex="-1" aria-labelledby="finalizarPedidoModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -51,7 +62,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ url_for('pedido.datos_restantes', id_pedido=id_pedido, id_cliente=id_cliente) }}" method="POST">
+                <form action="{{ url_for('pedido.datos_restantes', id_pedido=id_pedido, id_cliente=id_cliente) }}"
+                    method="POST">
                     <!-- Campo para dirección -->
                     <div class="mb-3">
                         <label for="direccion" class="form-label">Dirección</label>
