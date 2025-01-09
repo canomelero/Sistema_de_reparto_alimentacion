@@ -367,6 +367,33 @@ def aniadir_plato_pedido(id_cliente: int, id_plato: int, id_restaurante: int):
     # 204 indica que ha ido todo correcto pero no devuelve ningún recurso
     return Response(status=204) 
 
+<<<<<<< Updated upstream
+=======
+@bp.route('/eliminar_plato?id_cliente=<int:id_cliente>&id_plato=<int:id_plato>&'
+          'id_restaurante=<int:id_restaurante>', methods=("GET", "POST"))
+def eliminar_plato_pedido(id_cliente : int, id_plato : int):
+    cursor = get_db_cursor()
+    
+    cursor.execute(
+        """
+        SELECT id_pedido FROM pedido_incluye_reparte 
+        WHERE estado = 'Seleccionando' AND id_pedido IN 
+        (SELECT numero_pedido FROM factura WHERE id_cliente = %s)
+        """, (id_cliente,)
+    )
+    id_pedido_seleccionando = cursor.fetchone()
+
+    cursor.execute(
+        """
+        DELETE FROM pedido_plato WHERE id_pedido = %s AND id_plato = %s
+        """,
+        (id_pedido_seleccionando, id_plato)
+    )
+
+    return redirect(url_for("restaurante.mostrar_rest_plat", id_cliente = id_cliente))
+        
+
+>>>>>>> Stashed changes
 
 @bp.route('/pagar_pedido/<int:id_cliente>', methods=("GET", "POST"))
 def finalizar_pedido(id_cliente: int):

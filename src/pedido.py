@@ -87,8 +87,13 @@ def listarPedidos():
 
 
 
+<<<<<<< Updated upstream
 @bp.route('/pedido/datos_restantes/<int:id_pedido>', methods=["POST"])
 def datos_restantes(id_pedido):
+=======
+@bp.route('/pedido/datos_restantes?<int:id_pedido>&<int:id_cliente>', methods=['GET',"POST"])
+def datos_restantes(id_pedido, id_cliente):
+>>>>>>> Stashed changes
     db = get_db()
     cursor = get_db_cursor()
 
@@ -121,4 +126,100 @@ def datos_restantes(id_pedido):
         return f"Error al actualizar el pedido: {str(e)}", 500
 
     # Redirigir a una página de éxito o mostrar el mismo modal actualizado
+<<<<<<< Updated upstream
     return redirect(url_for("pedido.listarPedidos"))
+=======
+    return redirect(url_for("cliente.pedidos", id=id_cliente))
+
+
+@bp.route('/pedido/modificar/<int:id_pedido>', methods=['GET', 'POST'])
+def modificar_pedido(id_pedido):
+    # Obtener el tipo de acceso desde los parámetros
+    #identificador = request.form["identificador"]
+    #tipo_acceso = request.form["tipo_acceso"]
+    #print(f"\n\n\n{tipo_acceso}     \n\n\n")
+    cursor = get_db_cursor()
+
+
+    cursor.execute("SELECT id_cliente FROM factura WHERE numero_pedido=%s;", (id_pedido,))
+    id_cliente = cursor.fetchone()
+    
+    # Mostrar formulario para Trabajador o Cliente
+    #if tipo_acceso == "opcion1": #trabajador
+    #    return render_template('pedido/modificar_trabajador.html', id_pedido=id_pedido)
+    #elif tipo_acceso == "opcion3": #cliente
+    <a href="{{ url_for('pedido.modificar_pedido_cliente', id_pedido=id_pedido, id_cliente=id_cliente) }}" class="btn btn-primary">
+    Modificar Pedido
+</a>
+    #else:   
+     #   return "Tipo de acceso no válido", 400
+        #return redirect(url_for("pedido.listar_pedidos_filtrados"))
+
+
+
+@bp.route('/pedido/trabajador?id_pedido=<int:id_pedido>', methods=['GET', 'POST'])
+def modificar_pedido_trabajador(id_pedido):
+    db = get_db()
+    cursor = get_db_cursor()
+    estado = request.args.get('estado') 
+
+    try:
+        # Ejecutar el UPDATE en la base de datos
+        cursor.execute(
+            """
+            UPDATE pedido_incluye_reparte 
+            SET estado = %s
+            WHERE id_pedido = %s;
+            """,
+            (estado , id_pedido)
+        )
+
+        db.commit()
+
+        # Verificar si se actualizó algo
+        if cursor.rowcount == 0:
+            return f"No se encontró el pedido con ID {id_pedido}", 404
+
+    except Exception as e:
+        db.rollback()
+        return f"Error al actualizar el pedido: {str(e)}", 500
+    
+    return redirect(url_for("pedido.listar_pedidos_filtrados"))
+
+
+
+@bp.route('/pedido/cliente/id_pedido=<int:id_pedido>/id_cliente=<int:id_cliente>', methods=['GET','POST'])
+def modificar_pedido_cliente(id_pedido, id_cliente):
+    db = get_db()
+    cursor = get_db_cursor()
+    direccion_entrega = request.form.get("direccion")
+    observaciones = request.form.get("observaciones")
+
+    # Validar datos
+    if not direccion_entrega or not observaciones:
+        return "Datos inválidos", 400
+
+    try:
+        # Ejecutar el UPDATE en la base de datos
+        cursor.execute(
+            """
+            UPDATE pedido_incluye_reparte 
+            SET direccion_entrega = %s, observaciones = %s
+            WHERE id_pedido = %s;
+            """,
+            (direccion_entrega, observaciones, id_pedido)
+        )
+
+        db.commit()
+
+        # Verificar si se actualizó algo
+        if cursor.rowcount == 0:
+            return f"No se encontró el pedido con ID {id_pedido}", 404
+
+    except Exception as e:
+        db.rollback()
+        return f"Error al actualizar el pedido: {str(e)}", 500
+
+    # Redirigir a una página de éxito o mostrar el mismo modal actualizado
+    return redirect(url_for("cliente.pedidos", id=id_cliente))
+>>>>>>> Stashed changes
