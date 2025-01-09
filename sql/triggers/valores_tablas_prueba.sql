@@ -24,10 +24,3 @@ VALUES
 ('ana.lopez@ejemplo.com', 'Ana López', 'Avenida Principal 456', '0987654321', true),
 ('maria.gomez@ejemplo.com', 'María Gómez', 'Calle Secundaria 789', '1122334455', true),
 ('carlos.ruiz@ejemplo.com', 'Carlos Ruiz', 'Avenida Las Flores 321', '2233445566', true);
-
-
-INSERT INTO ventas_diarias (id_restaurante, fecha, tiempo_preparacion, total_ingresado, platos_vendidos) 
-VALUES 
-(1, '2024-12-29', 141, 78.5, 9),
-(1, '2024-12-30', 84, 45.5, 5);
-

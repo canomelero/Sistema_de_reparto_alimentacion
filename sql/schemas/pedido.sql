@@ -18,5 +18,4 @@ CREATE TABLE pedido_plato (
     id_plato INT,
     FOREIGN KEY (id_pedido) REFERENCES pedido_incluye_reparte(id_pedido),
     FOREIGN KEY (id_plato) REFERENCES plato_oferta(id_plato)
-
 )
