@@ -16,20 +16,25 @@
                     <th scope="col">Estado</th>
                     <th scope="col">Tiempo preparación</th>
                     <th scope="col">Tiempo entrega</th>
+                    <th scope="col">Acciones</th>
                 </thread>
 
                 <tbody>
                     {% for pedido in pedidos %}
-                        <tr>
-                            <td>{{ pedido.id_pedido }}</td>
-                            <td>{{ pedido.id_trabajador }}</td>
-                            <td>{{ pedido.direccion_entrega }}</td>
-                            <td>{{ pedido.observaciones }}</td>
-                            <td>{{ pedido.precio }} €</td>
-                            <td>{{ pedido.estado }}</td>
-                            <td>{{ pedido.tiempo_preparacion }} min</td>
-                            <td>{{ pedido.tiempo_entrega }} min</td>
-                        </tr>
+                    <tr>
+                        <td>{{ pedido.id_pedido }}</td>
+                        <td>{{ pedido.id_trabajador }}</td>
+                        <td>{{ pedido.direccion_entrega }}</td>
+                        <td>{{ pedido.observaciones }}</td>
+                        <td>{{ pedido.precio }} €</td>
+                        <td>{{ pedido.estado }}</td>
+                        <td>{{ pedido.tiempo_preparacion }} min</td>
+                        <td>{{ pedido.tiempo_entrega }} min</td>
+                        <td>
+                            <a href="{{ url_for('cliente.pedidos', id = cliente.id_cliente) }}"
+                                class="btn btn-success btn-sm">Modificar</a>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

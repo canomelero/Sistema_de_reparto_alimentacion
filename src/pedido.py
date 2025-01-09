@@ -89,8 +89,6 @@ def listarPedidos():
                             pedido_incluye_reparte = pedidos)
 
 
-
-
 @bp.route('/pedido/datos_restantes?<int:id_pedido>&<int:id_cliente>', methods=["POST"])
 def datos_restantes(id_pedido, id_cliente):
     db = get_db()
@@ -127,3 +125,5 @@ def datos_restantes(id_pedido, id_cliente):
 
     # Redirigir a una página de éxito o mostrar el mismo modal actualizado
     return redirect(url_for("cliente.pedidos", id=id_cliente))
+
+
